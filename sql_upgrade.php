@@ -21,7 +21,7 @@ require_once('library/sql_upgrade_fx.php');
 
 // Force logging off
 $GLOBALS["enable_auditlog"]=0;
-
+ 
 $versions = array();
 $sqldir = "$webserver_root/sql";
 $dh = opendir($sqldir);
@@ -47,11 +47,63 @@ ksort($versions);
 <br>
 </center>
 <?php
-if (!empty($_POST['form_submit'])) {
-  $form_old_version = $_POST['form_old_version'];
+$version_table_exist = sqlQuery("SHOW TABLES LIKE 'version'");
+if ($version_table_exist) {
+    $version_info = sqlQuery("SELECT * FROM version");
+    $version_from  = $version_info['v_major'] . '.' . $version_info['v_minor'] . '.' . $version_info['v_patch'];
+    $dev_version = $version_info['v_tag'];
+    }
+$your_version = $version_from;
+$versions_index_array = array_keys($versions);
+$versions_index_lenght = count($versions_index_array);
+ksort($versions_index_array);
+$most_recent_version = $versions_index_array[$versions_index_lenght - 1];
+if (($dev_version != '-dev') && ($version_table_exist)) {
+    $version_top_nodev_flag = FALSE;
+      for ($x=0;$x<$versions_index_lenght;$x++) {
+         if ($versions_index_array[$x] == $version_from) {
+            $version_nodev_index = $x;
+       }
+   }
+    $version_from = $versions_index_array[$version_nodev_index];
+    if ($version_from == $most_recent_version) {
+       $version_from = $versions_index_array[$versions_index_lenght - 2];
+       $version_top_nodev_flag = TRUE;
+      }
+}
+if (($dev_version == '-dev') && ($version_table_exist)) {
+    $versions_dev = array_keys($versions);
+    ksort($versions_dev);
+    $array_lenght = count($versions_dev);
+    $version_top_dev_flag = TRUE;
+    for ($x=0;$x<$versions_index_lenght;$x++) {
+       if ($versions_index_array[$x] == $version_from) {
+         $version_dev_index = $x;
+         $version_top_dev_flag = FALSE;
+        }
+     }
+      $version_from = $versions_index_array[$version_dev_index - 1];
+      if ($version_top_dev_flag) {
+         $version_from = $versions_index_array[$versions_index_lenght - 1];
+         }
+}
+if (isset($_GET['version_override'])) {
+    $version_override=$_GET['version_override'];
+    $valid_version_flag = FALSE;
+    for ($x=0;$x<$versions_index_lenght;$x++) {
+      if ($versions_index_array[$x] == $version_override) {
+         $valid_version_flag = TRUE;
+         $version_from = $version_override;
+       }
+     }
+   }
 
+if (!empty($_POST['form_submit'])) {
+  if (!empty($_POST['form_old_version'])) {
+    $version_from = $_POST['form_old_version'];
+   }
   foreach ($versions as $version => $filename) {
-    if (strcmp($version, $form_old_version) < 0) continue;
+      if (strcmp($version, $version_from) < 0) continue;
     upgradeFromSqlFile($filename);
   }
 
@@ -91,21 +143,72 @@ if (!empty($_POST['form_submit'])) {
 
 ?>
 <center>
-<form method='post' action='sql_upgrade.php'>
-<p>Please select the prior release you are converting from:
-<select name='form_old_version'>
+<form method='post' action='sql_upgrade_improve2_clean.php'>
 <?php
-foreach ($versions as $version => $filename) {
-  echo " <option value='$version'";
-  // Defaulting to most recent version, which is now 4.1.2.
-  if ($version === '4.1.2') echo " selected";
-  echo ">$version</option>\n";
+if ($valid_version_flag === FALSE) {
+    echo "***  The version_override in the url is invalid ****<br>";
+   }
+if (!$version_table_exist) {
+   echo "It appears no version table exist<br><br>";
+   echo "Please select the prior release you are converting from: <br><br>";
+?>
+   <select name='form_old_version'>
+<?php
+   foreach  ($versions as $version => $filename) {
+      echo " <option value='$version'";
+        if ($version === $most_recent_version) echo " selected";
+      echo ">$version</option>\n";
+   }
 }
 ?>
 </select>
+<?php
+if (($dev_version != '-dev') && ($version_table_exist)) {
+?>
+    <p>Your Openemr database version is : <?php echo $your_version;?></p>
+    <p>v_tag  in version table is : <?php echo $dev_version;?></p>
+<?php
+    if ($version_top_nodev_flag) {
+      echo "It appears the version is up to date<br><br>";
+     }
+    echo "Please select the prior release you are converting from: <br><br>";
+?>
+         <select name='form_old_version'>
+<?php
+         foreach  ($versions as $version => $filename) {
+               echo " <option value='$version'";
+                // if ($version === $most_recent_version) echo " selected";
+                  if ($version === $version_from) echo " selected";
+                  echo ">$version</option>\n";
+                 }
+       }
+?>
+</select>
+<?php
+    if (($dev_version == '-dev') && ($version_table_exist))   {
+        echo "Your Openemr database version is : $your_version <br>";
+        echo "v_tag in version table is : $dev_version <br>";
+        echo "Openemr prior release has being selected from the version table: ";
+        echo $version_from; echo"<br><br>";
+        echo "Or if you prefer to select the release you are converting from: <br>";
+?>
+        <select name='form_old_version'>
+<?php
+        foreach  ($versions as $version => $filename) {
+            echo " <option value='$version'";
+            if ($version === $version_from) echo " selected";
+             echo ">$version</option>\n";
+         }
+       }
+?>
+</select>
+<br><br>
+If you are unsure or were using a development version between two<br>
+releases, them choose the older of possible releases.
+<br>
+
 </p>
-<p>If you are unsure or were using a development version between two
-releases, then choose the older of possible releases.</p>
+<p>Click to continue upgrade.</p>
 <p><input type='submit' name='form_submit' value='Upgrade Database' /></p>
 </form>
 </center>
