@@ -13,6 +13,37 @@
     var list = new list_rules();
     list.init();
 </script>
+<style type="text/css">
+    .Table
+    {
+        display: table;
+    }
+    .Title
+    {
+        display: table-caption;
+        text-align: center;
+        font-weight: bold;
+        font-size: larger;
+    }
+    .Heading
+    {
+        display: table-row;
+        font-weight: bold;
+        text-align: center;
+    }
+    .Row
+    {
+        display: table-row;
+    }
+    .Cell
+    {
+        display: table-cell;
+        border: solid;
+        border-width: thin;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+</style>
 
 <table class="header">
   <tr>
@@ -24,6 +55,45 @@
         </td>
   </tr>
 </table>
+
+<div>
+	<form>
+		<div class="Table">
+		    <div class="Heading">
+		        <div class="Cell">
+		            <p>Plans</p>
+		        </div>
+		        <div class="Cell">
+		            <p></p>
+		        </div>
+		    </div>
+		    <div class="Row">
+		        <div class="Cell">
+		            <p>Preventative Care</p>
+		        </div>
+		        <div class="Cell">
+		            <p><button type="button">Edit</button></p>
+		        </div>
+		    </div>
+		    <div class="Row">
+		        <div class="Cell">
+		            <p>Diabetes Mellitus</p>
+		        </div>
+		        <div class="Cell">
+		            <p><button type="button">Edit</button></p>
+		        </div>
+		    </div>
+		    <div class="Row">
+		        <div class="Cell">
+		            <p><button type="button">Add New Plan</button></p>
+		        </div>
+		        <div class="Cell">
+		            <p></p>
+		        </div>
+		    </div>		    
+		</div>	
+	</form>
+</div>
 
 <div class="rule_container text">
     <div class="rule_row header">
