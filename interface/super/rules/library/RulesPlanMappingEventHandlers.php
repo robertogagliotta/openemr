@@ -4,10 +4,19 @@ class RuleTransaction {
 	public $transactionType;
 }
 
-function getPlans() {
-	//TODO: Implement code to return list of plans
-	 
-	return null;
+function getNonCQMPlans() {
+	$result = mysql_query("call get_noncqm_cdr_plans('clinical_plans')");
+	if ($result === FALSE) {
+		die(mysql_error());
+	}
+
+	$plans = array();
+	
+	while($row = mysql_fetch_array($result)) {
+		$plans[$row['plan_id']] = $row['title'];
+	}
+	
+	return $plans;
 }
 
 function getRulesOfPlan($listOfPlans) {
