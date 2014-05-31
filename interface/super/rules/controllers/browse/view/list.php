@@ -64,33 +64,64 @@
 		            <p>Plans</p>
 		        </div>
 		        <div class="Cell">
-		            <p></p>
+		            <p>Rules In Plan</p>
 		        </div>
+		        <div class="Cell">
+		        </div>			        
+		        <div class="Cell">
+		            <p>Rules Not In Plan</p>
+		        </div>		        
 		    </div>
 		    <div class="Row">
 		        <div class="Cell">
-		            <p>Preventative Care</p>
+		        	<div class="InnerCell">
+			        	<input type="text" name="fname" value="Search"/>
+		        	</div>
+		        	<div class="InnerCell">
+			            <select name="sometext" size="10">
+						  <option>Preventative Care</option>
+						  <option>Diabetes Mellitus</option>
+						  <option>Plan 3</option>
+						  <option>Plan 4</option>
+						  <option>Plan 5</option>
+						</select>
+					</div>
 		        </div>
 		        <div class="Cell">
-		            <p><button type="button">Edit</button></p>
-		        </div>
-		    </div>
-		    <div class="Row">
+		        	<div class="InnerCell">
+			        	<input type="text" name="fname" value="Search"/>
+		        	</div>
+		        	<div class="InnerCell">
+			            <select name="sometext" size="10">
+						  <option>Adult Weight Screening and Follow-Up</option>
+						  <option>Cancer Screening: Mammogram</option>
+						  <option>Cancer Screening: Pap Smear</option>
+						  <option>Diabetes: Eye Exam</option>
+						  <option>Diabetes: Foot Exam</option>
+						</select>
+					</div>		        
+				</div>
 		        <div class="Cell">
-		            <p>Diabetes Mellitus</p>
-		        </div>
+		        	<div class="InnerCell">
+		            	<button type="button">>></button>
+		            </div>
+		            <div class="InnerCell">
+		            	<button type="button"><<</button>
+		            </div>
+		        </div>	
 		        <div class="Cell">
-		            <p><button type="button">Edit</button></p>
-		        </div>
-		    </div>
-		    <div class="Row">
-		        <div class="Cell">
-		            <p><button type="button">Add New Plan</button></p>
-		        </div>
-		        <div class="Cell">
-		            <p></p>
-		        </div>
-		    </div>		    
+		        	<div class="InnerCell">
+			        	<input type="text" name="fname" value="Search"/>
+		        	</div>
+		        	<div class="InnerCell">
+			            <select name="sometext" size="10">
+						  <option>Diabetes: Hemoglobin A1C</option>
+						  <option>Diabetes: Urine Microalbumin</option>
+						  <option>Tobacco Cessation Intervention</option>
+						  <option>Tobacco Use Assessment</option>
+						</select>
+					</div>				        </div>			        	        
+		    </div>	    
 		</div>	
 	</form>
 </div>
