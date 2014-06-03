@@ -47,32 +47,11 @@ ksort($versions);
 <br>
 </center>
 <?php
-$version_table_exist = sqlQuery("SHOW TABLES LIKE 'version'");
-if ($version_table_exist) {
-    $version_info = sqlQuery("SELECT * FROM version");
-    $version_from  = $version_info['v_major'] . '.' . $version_info['v_minor'] . '.' . $version_info['v_patch'];
-    $dev_version = $version_info['v_tag'];
-    }
-if (($dev_version == '-dev') && ($version_table_exist)) {
-    $versions_dev = array_keys($versions);  //copy to an index array
-    ksort($versions_dev);
-    $array_lenght = count($versions_dev);
-    $version_top_dev_flag = TRUE;  //most updated version
-    for ($x=0;$x<$array_lenght;$x++)  {
-      if  ($versions_dev[$x] == $version_from) {
-        $version_dev_index = $x;
-        $version_top_dev_flag = FALSE;
-      }
-    }
-    $version_from = $versions_dev[$version_dev_index - 1]; //version below
-    if ($version_top_dev_flag)  {
-      $version_from = $versions_dev[$array_lenght - 1];
-    }
-}    
 if (!empty($_POST['form_submit'])) {
   $form_old_version = $_POST['form_old_version'];
+
   foreach ($versions as $version => $filename) {
-    if (strcmp($version, $version_from) < 0) continue;
+    if (strcmp($version, $form_old_version) < 0) continue;
     upgradeFromSqlFile($filename);
   }
 
@@ -113,28 +92,20 @@ if (!empty($_POST['form_submit'])) {
 ?>
 <center>
 <form method='post' action='sql_upgrade.php'>
+<p>Please select the prior release you are converting from:
+<select name='form_old_version'>
 <?php
-if  (!$version_table_exist)  {
-?>
-     <select name='form_old_version'>
-<?php
-     echo "Please select the prior release you are converting from: ";
-     foreach  ($versions as $version => $filename) {
-       echo " <option value='$version'";
-       if  ($version ==='4.1.2') echo " selected";
-         echo ">$version</option>\n";
-     }
-     
-} else
-{
-  echo "Openemr prior release has being selected from the version table: ";
-  echo $version_from;
+foreach ($versions as $version => $filename) {
+  echo " <option value='$version'";
+  // Defaulting to most recent version, which is now 4.1.2.
+  if ($version === '4.1.2') echo " selected";
+  echo ">$version</option>\n";
 }
 ?>
 </select>
-
 </p>
-<p>Click to continuo upgrade.</p>
+<p>If you are unsure or were using a development version between two
+releases, then choose the older of possible releases.</p>
 <p><input type='submit' name='form_submit' value='Upgrade Database' /></p>
 </form>
 </center>
