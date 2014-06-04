@@ -132,7 +132,7 @@ if (!empty($_POST['form_submit'])) {
 
 ?>
 <center>
-<form method='post' action='sql_upgrade_commit6.php'>
+<form method='post' action='sql_upgrade.php'>
 <?php
 if (!$version_table_exist) {
    echo "It appers no version table exist<br><br>";
