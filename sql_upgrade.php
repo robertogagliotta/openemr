@@ -185,6 +185,7 @@ if (($dev_version != '-dev') && ($version_table_exist)) {
         foreach  ($versions as $version => $filename) {
             echo " <option value='$version'";
             //if ($version === $most_recent_version) echo " selected";
+            // select the previous version from the select list
             if ($version === $version_from) echo " selected";
              echo ">$version</option>\n";
          }
