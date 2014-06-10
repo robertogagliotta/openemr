@@ -1,34 +1,137 @@
 <?php
+require_once($_SERVER['DOCUMENT_ROOT'] . "/interface/globals.php");
+require_once($_SERVER['DOCUMENT_ROOT'] . "/library/log.inc");
+require_once($_SERVER['DOCUMENT_ROOT'] . "/library/sql.inc");
+
+if ($_GET["action"] == "getNonCQMPlans") {
+	$plans = getNonCQMPlans();
+	
+	echo '[';
+	$i = 0;
+	foreach ($plans as $key => $value) {
+		if ($i > 0) {
+			echo ", ";
+		}
+		
+		echo '{ "plan_id":"' . $key . '" , "plan_title":"' . $value . '" }';
+		$i++;
+	}
+	echo ']';
+} else if ($_GET["action"] == "getRulesOfPlan") {
+	$rules = getRulesInPlan($_GET["plan_id"]);
+	
+	echo '[';
+	$i = 0;
+	foreach ($rules as $key => $value) {
+		if ($i > 0) {
+			echo ", ";
+		}
+	
+		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
+		$i++;
+	}
+	echo ']';
+} else if ($_GET["action"] == "getRulesNotInPlan") {
+	$rules = getRulesNotInPlan($_GET["plan_id"]);
+	
+	echo '[';
+	$i = 0;
+	foreach ($rules as $key => $value) {
+		if ($i > 0) {
+			echo ", ";
+		}
+	
+		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
+		$i++;
+	}
+	echo ']';
+	
+} else if ($_GET["action"] == "getRulesInAndNotInPlan") {
+	$rules = getRulesInPlan($_GET["plan_id"]);
+
+	echo '[';
+	
+	$i = 0;
+	foreach ($rules as $key => $value) {
+		if ($i > 0) {
+			echo ", ";
+		}
+
+		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"true" }';
+		$i++;
+	}
+	
+	$rules = getRulesNotInPlan($_GET["plan_id"]);
+	foreach ($rules as $key => $value) {
+		if ($i > 0) {
+			echo ", ";
+		}
+	
+		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"false" }';
+		$i++;
+	}
+	
+	echo ']';
+}
+
+
 class RuleTransaction {
 	public $ruleid;
 	public $transactionType;
 }
 
-function getNonCQMPlans() {
-	$result = mysql_query("call get_noncqm_cdr_plans('clinical_plans')");
-	if ($result === FALSE) {
-		die(mysql_error());
-	}
-
+function getNonCQMPlans() {	
 	$plans = array();
 	
-	while($row = mysql_fetch_array($result)) {
+	$sql_st = "SELECT DISTINCT list_options.title, clin_plans_rules.plan_id " .
+				"FROM `list_options` list_options " . 
+				"JOIN `clinical_plans_rules` clin_plans_rules ON clin_plans_rules.plan_id = list_options.option_id " .
+				"JOIN `clinical_rules` clin_rules ON clin_rules.id = clin_plans_rules.rule_id " .
+				"WHERE (clin_rules.cqm_flag = 0 or clin_rules.cqm_flag is NULL) and list_options.list_id = ?;";
+	$result = sqlStatement($sql_st, array('clinical_plans'));
+	
+	while($row = sqlFetchArray($result)) {
 		$plans[$row['plan_id']] = $row['title'];
 	}
-	
 	return $plans;
 }
 
-function getRulesOfPlan($listOfPlans) {
-	//TODO: implement code to return rules for each plan in the input
+function getRulesInPlan($plan_id) {
+	$rules = array();
 	
-	return null;
+	$sql_st = "SELECT lst_opt.option_id as rule_option_id, lst_opt.title as rule_title " .
+				"FROM `clinical_plans_rules` cpr " .
+				"JOIN `list_options` lst_opt ON lst_opt.option_id = cpr.rule_id " .
+				"WHERE cpr.plan_id = ?;";
+	$result = sqlStatement($sql_st, array($plan_id));
+	
+	while($row = sqlFetchArray($result)) {
+		$rules[$row['rule_option_id']] = $row['rule_title'];
+	}
+	
+	return $rules;
 }
 
-function getRulesNotInPlan($listOfPlans) {
-	//TODO: implement code to return rules that are not part of each plan in the input
+function getRulesNotInPlan($plan_id) {
+	$rules = array();
 	
-	return null;
+	$sql_st = "SELECT lst_opt.option_id as rule_option_id, lst_opt.title as rule_title " .
+				"FROM `clinical_rules` clin_rules " .
+				"JOIN `list_options` lst_opt ON lst_opt.option_id = clin_rules.id " .
+				"WHERE lst_opt.option_id NOT IN " .
+					"( " .
+					"SELECT lst_opt.option_id " .
+					"FROM `clinical_plans_rules` cpr " .
+					"JOIN `list_options` lst_opt ON lst_opt.option_id = cpr.rule_id " .
+					"WHERE cpr.plan_id = ?" .
+					"); ";
+	$result = sqlStatement($sql_st, array($plan_id));
+	
+	while($row = sqlFetchArray($result)) {
+		$rules[$row['rule_option_id']] = $row['rule_title'];
+	}
+	
+	return $rules;
 }
 
 function addNewPlan($plan_name, $plan_rules) {
