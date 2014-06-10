@@ -6,44 +6,99 @@
  // as published by the Free Software Foundation; either version 2
  // of the License, or (at your option) any later version.
 ?>
+
+<link type="text/css" rel="stylesheet" href="/interface/super/rules/www/css/cdr-multiselect/common.css" />
+<link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/ui-lightness/jquery-ui.css" />
+<link type="text/css" rel="stylesheet" href="/interface/super/rules/www/css/cdr-multiselect/ui.multiselect.css" />
+
+<style type="text/css">
+ 	.cdr-mappings
+ 	{
+ 		display: table;
+ 		margin-left:15px;
+ 	}
+ 	
+ 	.cdr-buttons-class
+ 	{
+ 		float:right;
+ 	}
+ </style>
+
 <script language="javascript" src="<?php js_src('list.js') ?>"></script>
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/plugins/localisation/jquery.localisation-min.js"></script>
+<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/plugins/scrollTo/jquery.scrollTo-min.js"></script>
+<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/ui.multiselect.js"></script>
 
 <script type="text/javascript">
     var list = new list_rules();
     list.init();
 </script>
-<style type="text/css">
-    .Table
-    {
-        display: table;
-    }
-    .Title
-    {
-        display: table-caption;
-        text-align: center;
-        font-weight: bold;
-        font-size: larger;
-    }
-    .Heading
-    {
-        display: table-row;
-        font-weight: bold;
-        text-align: center;
-    }
-    .Row
-    {
-        display: table-row;
-    }
-    .Cell
-    {
-        display: table-cell;
-        border: solid;
-        border-width: thin;
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-</style>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		var submit_but_displayed = false;
+		$("#cdr-plans").load('/interface/super/rules/library/RulesPlanMappingEventHandlers.php');
+		
+	    $.post(
+	   		'library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'
+	    ).success(function(resp) {
+	        var data = $.parseJSON(resp);
+
+	        $.each(data, function(idx, obj) {
+	        	$('<option id="' + obj.plan_id + '" value="' + obj.plan_id + '">' + obj.plan_title + '</option>')
+	        		.insertAfter('#select_plan')
+	        		.insertBefore('#divider');
+	        });	        
+	    });
+
+		$("#cdr-plans-select").change(function(){
+			var selected_plan = this.value;
+			$("#cdr_rules").empty();
+			
+			if (selected_plan != 'select_plan') {
+				if (!submit_but_displayed) {
+					$("#cdr_buttons_div").append("<button id='cdr-button'>Commit</button>");
+					submit_but_displayed = true;
+				}
+
+			    $.post
+			    	('library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id=' + selected_plan)
+					.success(function(resp) {
+				        var data = $.parseJSON(resp);
+				        
+				        $('#cdr_rules')
+				        	.append('<select id="cdr_rules_select" class="multiselect" multiple="multiple" name="cdr_rules[]"/>');
+				        
+				        $.each(data, function(idx, obj) {  		
+							if (obj.selected  == "true") {
+								$("#cdr_rules_select")
+									.append(
+										$('<option value="' + obj.rule_id + '" selected="selected" init_value="selected">' + obj.rule_title + '</option>')
+									);
+							} else {
+								$("#cdr_rules_select")
+									.append(
+										$('<option value="' + obj.rule_id + '" init_value="not-selected">' + obj.rule_title + '</option>')
+									);
+							}								
+						});
+
+				        $("#cdr_rules_select").multiselect({sortable: false});
+			     	});	
+		     				    
+			} else {
+				$("#cdr_buttons_div").empty();
+				submit_but_displayed = false;
+			}		
+		});
+    });
+    
+</script>
 
 <table class="header">
   <tr>
@@ -56,74 +111,30 @@
   </tr>
 </table>
 
-<div>
-	<form>
-		<div class="Table">
-		    <div class="Heading">
-		        <div class="Cell">
-		            <p>Plans</p>
-		        </div>
-		        <div class="Cell">
-		            <p>Rules In Plan</p>
-		        </div>
-		        <div class="Cell">
-		        </div>			        
-		        <div class="Cell">
-		            <p>Rules Not In Plan</p>
-		        </div>		        
-		    </div>
-		    <div class="Row">
-		        <div class="Cell">
-		        	<div class="InnerCell">
-			        	<input type="text" name="fname" value="Search"/>
-		        	</div>
-		        	<div class="InnerCell">
-			            <select name="sometext" size="10">
-						  <option>Preventative Care</option>
-						  <option>Diabetes Mellitus</option>
-						  <option>Plan 3</option>
-						  <option>Plan 4</option>
-						  <option>Plan 5</option>
-						</select>
-					</div>
-		        </div>
-		        <div class="Cell">
-		        	<div class="InnerCell">
-			        	<input type="text" name="fname" value="Search"/>
-		        	</div>
-		        	<div class="InnerCell">
-			            <select name="sometext" size="10">
-						  <option>Adult Weight Screening and Follow-Up</option>
-						  <option>Cancer Screening: Mammogram</option>
-						  <option>Cancer Screening: Pap Smear</option>
-						  <option>Diabetes: Eye Exam</option>
-						  <option>Diabetes: Foot Exam</option>
-						</select>
-					</div>		        
-				</div>
-		        <div class="Cell">
-		        	<div class="InnerCell">
-		            	<button type="button">>></button>
-		            </div>
-		            <div class="InnerCell">
-		            	<button type="button"><<</button>
-		            </div>
-		        </div>	
-		        <div class="Cell">
-		        	<div class="InnerCell">
-			        	<input type="text" name="fname" value="Search"/>
-		        	</div>
-		        	<div class="InnerCell">
-			            <select name="sometext" size="10">
-						  <option>Diabetes: Hemoglobin A1C</option>
-						  <option>Diabetes: Urine Microalbumin</option>
-						  <option>Tobacco Cessation Intervention</option>
-						  <option>Tobacco Use Assessment</option>
-						</select>
-					</div>				        </div>			        	        
-		    </div>	    
-		</div>	
+<div class="cdr-mappings">
+	<br/>
+	<div><b>View Rules Plan Mappings</b></div>
+	
+	<div class="cdr-form">
+		<form action="">
+			<div class="cdr-plans">
+				Plan:
+				<select id="cdr-plans-select" name="cdr-plans-select" class="cdr-plans-select-class">
+					<option id="select_plan" value="select_plan">- SELECT PLAN -</option>
+					<option id="divider" value="divider" disabled/>
+					<option value="add_new_plan">ADD NEW PLAN</option>
+				</select>
+			</div>	
+	
+			<div id="cdr_rules" class="cdr-rules-class">
+				<!-- style="display: none;">-->
+				<!--<select id="cdr_rules_select" class="multiselect" multiple="multiple" name="cdr_rules[]"></select>-->
+	      	</div>   	
+	      	
+	      	<div id="cdr_buttons_div" class="cdr-buttons-class"></div>
+
 	</form>
+	</div>
 </div>
 
 <div class="rule_container text">
