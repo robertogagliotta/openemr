@@ -1,7 +1,9 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'] . "/interface/globals.php");
-require_once($_SERVER['DOCUMENT_ROOT'] . "/library/log.inc");
-require_once($_SERVER['DOCUMENT_ROOT'] . "/library/sql.inc");
+
+require_once( dirname(__FILE__) . "/../../../globals.php" );
+require_once( $GLOBALS['srcdir'] . "/log.inc");
+require_once( $GLOBALS['srcdir'] . "/sql.inc");
+
 
 if ($_GET["action"] == "getNonCQMPlans") {
 	$plans = getNonCQMPlans();
@@ -72,13 +74,14 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	}
 	
 	echo ']';
+	
+} else if ($_GET["action"] == "commitChanges") {
+	//print_r($_POST['cdr_rules_select']);
+	echo '1' . dirname(__FILE__) . '<br/> 2' . $GLOBALS['srcdir'];
+
 }
 
 
-class RuleTransaction {
-	public $ruleid;
-	public $transactionType;
-}
 
 function getNonCQMPlans() {	
 	$plans = array();

@@ -8,6 +8,7 @@
 ?>
 
 <link type="text/css" rel="stylesheet" href="/interface/super/rules/www/css/cdr-multiselect/common.css" />
+<!-- TO DO: -->
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/ui-lightness/jquery-ui.css" />
 <link type="text/css" rel="stylesheet" href="/interface/super/rules/www/css/cdr-multiselect/ui.multiselect.css" />
 
@@ -27,8 +28,8 @@
 <script language="javascript" src="<?php js_src('list.js') ?>"></script>
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
 
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/jquery.min.js"></script>
+<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/plugins/localisation/jquery.localisation-min.js"></script>
 <script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/plugins/scrollTo/jquery.scrollTo-min.js"></script>
 <script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/ui.multiselect.js"></script>
@@ -41,7 +42,6 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		var submit_but_displayed = false;
 		$("#cdr-plans").load('/interface/super/rules/library/RulesPlanMappingEventHandlers.php');
 		
 	    $.post(
@@ -61,10 +61,7 @@
 			$("#cdr_rules").empty();
 			
 			if (selected_plan != 'select_plan') {
-				if (!submit_but_displayed) {
-					$("#cdr_buttons_div").append("<button id='cdr-button'>Commit</button>");
-					submit_but_displayed = true;
-				}
+				$("#cdr-button").show();
 
 			    $.post
 			    	('library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id=' + selected_plan)
@@ -72,7 +69,7 @@
 				        var data = $.parseJSON(resp);
 				        
 				        $('#cdr_rules')
-				        	.append('<select id="cdr_rules_select" class="multiselect" multiple="multiple" name="cdr_rules[]"/>');
+				        	.append('<select id="cdr_rules_select" class="multiselect" multiple="multiple" name="cdr_rules_select[]"/>');
 				        
 				        $.each(data, function(idx, obj) {  		
 							if (obj.selected  == "true") {
@@ -92,9 +89,12 @@
 			     	});	
 		     				    
 			} else {
-				$("#cdr_buttons_div").empty();
-				submit_but_displayed = false;
+				$("#cdr-button").hide();
 			}		
+		});
+
+		$("#cdr-button").click(function() {
+			
 		});
     });
     
@@ -116,7 +116,7 @@
 	<div><b>View Rules Plan Mappings</b></div>
 	
 	<div class="cdr-form">
-		<form action="">
+		<!--<form action="library/RulesPlanMappingEventHandlers.php?action=commitChanges" method="post">-->
 			<div class="cdr-plans">
 				Plan:
 				<select id="cdr-plans-select" name="cdr-plans-select" class="cdr-plans-select-class">
@@ -126,14 +126,13 @@
 				</select>
 			</div>	
 	
-			<div id="cdr_rules" class="cdr-rules-class">
-				<!-- style="display: none;">-->
-				<!--<select id="cdr_rules_select" class="multiselect" multiple="multiple" name="cdr_rules[]"></select>-->
-	      	</div>   	
+			<div id="cdr_rules" class="cdr-rules-class"></div>   	
 	      	
-	      	<div id="cdr_buttons_div" class="cdr-buttons-class"></div>
+	      	<div id="cdr_buttons_div" class="cdr-buttons-class">
+	      		<button id='cdr-button' style="display: none;">Commit</button>
+	      	</div>
 
-	</form>
+	<!--</form>-->
 	</div>
 </div>
 
