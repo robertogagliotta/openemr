@@ -77,7 +77,7 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	
 } else if ($_GET["action"] == "commitChanges") {
 	//print_r($_POST['cdr_rules_select']);
-	echo '1' . dirname(__FILE__) . '<br/> 2' . $GLOBALS['srcdir'];
+	//echo '1' . library_dir();
 
 }
 

@@ -37,13 +37,12 @@
     list.init();
 </script>
 
-
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#cdr-plans").load('/interface/super/rules/library/RulesPlanMappingEventHandlers.php');
+		$("#cdr-plans").load('<?php library_src('RulesPlanMappingEventHandlers.php') ?>');
 		
 	    $.post(
-	   		'/interface/super/rules/library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'
+	    	'<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'; ?>'
 	    ).success(function(resp) {
 	        var data = $.parseJSON(resp);
 
@@ -62,7 +61,11 @@
 				$("#cdr-button").show();
 
 			    $.post
-			    	('/interface/super/rules/library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id=' + selected_plan)
+			    	(
+				    	'<?php echo  _base_url() . 
+				    			'/library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id='; ?>' 
+				    	+ selected_plan								
+					)
 					.success(function(resp) {
 				        var data = $.parseJSON(resp);
 				        
