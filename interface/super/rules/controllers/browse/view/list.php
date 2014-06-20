@@ -7,10 +7,9 @@
  // of the License, or (at your option) any later version.
 ?>
 
-<link type="text/css" rel="stylesheet" href="/interface/super/rules/www/css/cdr-multiselect/common.css" />
-<!-- TO DO: -->
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/ui-lightness/jquery-ui.css" />
-<link type="text/css" rel="stylesheet" href="/interface/super/rules/www/css/cdr-multiselect/ui.multiselect.css" />
+<link type="text/css" rel="stylesheet" href="<?php css_src('/cdr-multiselect/common.css') ?>" />
+<link type="text/css" rel="stylesheet" href="<?php css_src('/cdr-multiselect/ui.multiselect.css') ?>" />
 
 <style type="text/css">
  	.cdr-mappings
@@ -25,14 +24,13 @@
  	}
  </style>
 
+<script language="javascript" src="<?php js_src('/cdr-multiselect/jquery.min.js') ?>"></script>
+<script language="javascript" src="<?php js_src('/cdr-multiselect/jquery-ui.min.js') ?>"></script>
+<script language="javascript" src="<?php js_src('/cdr-multiselect/plugins/localisation/jquery.localisation-min.js') ?>"></script>
+<script language="javascript" src="<?php js_src('/cdr-multiselect/plugins/scrollTo/jquery.scrollTo-min.js') ?>"></script>
+<script language="javascript" src="<?php js_src('/cdr-multiselect/ui.multiselect.js') ?>"></script>
 <script language="javascript" src="<?php js_src('list.js') ?>"></script>
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
-
-<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/jquery.min.js"></script>
-<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/plugins/localisation/jquery.localisation-min.js"></script>
-<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/plugins/scrollTo/jquery.scrollTo-min.js"></script>
-<script type="text/javascript" src="/interface/super/rules/www/js/cdr-multiselect/ui.multiselect.js"></script>
 
 <script type="text/javascript">
     var list = new list_rules();
@@ -45,7 +43,7 @@
 		$("#cdr-plans").load('/interface/super/rules/library/RulesPlanMappingEventHandlers.php');
 		
 	    $.post(
-	   		'library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'
+	   		'/interface/super/rules/library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'
 	    ).success(function(resp) {
 	        var data = $.parseJSON(resp);
 
@@ -64,7 +62,7 @@
 				$("#cdr-button").show();
 
 			    $.post
-			    	('library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id=' + selected_plan)
+			    	('/interface/super/rules/library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id=' + selected_plan)
 					.success(function(resp) {
 				        var data = $.parseJSON(resp);
 				        
