@@ -86,7 +86,7 @@
 							}								
 						});
 
-				        $("#cdr_rules_select").multiselect({sortable: false});
+				        $("#cdr_rules_select").multiselect();
 			     	});	
 		     				    
 			} else {
