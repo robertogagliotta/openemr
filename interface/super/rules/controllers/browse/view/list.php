@@ -7,7 +7,7 @@
  // of the License, or (at your option) any later version.
 ?>
 
-<link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/themes/ui-lightness/jquery-ui.css" />
+<link type="text/css" rel="stylesheet" href="/library/css/jquery-ui-1.8.21.custom.css" />
 <link type="text/css" rel="stylesheet" href="<?php css_src('/cdr-multiselect/common.css') ?>" />
 <link type="text/css" rel="stylesheet" href="<?php css_src('/cdr-multiselect/ui.multiselect.css') ?>" />
 
@@ -58,7 +58,7 @@
 			$("#cdr_rules").empty();
 			
 			if (selected_plan != 'select_plan') {
-				$("#cdr-button").show();
+				$("#cdr_buttons_div").show();	
 
 			    $.post
 			    	(
@@ -90,14 +90,14 @@
 			     	});	
 		     				    
 			} else {
-				$("#cdr-button").hide();
+				$("#cdr_buttons_div").hide();
 			}		
 		});
+		
+	});
 
-		$("#cdr-button").click(function() {
-			
-		});
-    });
+	$("#cdr-button-cancel").click();
+	$("#cdr-button-submit").click();
     
 </script>
 
@@ -129,8 +129,9 @@
 	
 			<div id="cdr_rules" class="cdr-rules-class"></div>   	
 	      	
-	      	<div id="cdr_buttons_div" class="cdr-buttons-class">
-	      		<button id='cdr-button' style="display: none;">Commit</button>
+	      	<div id="cdr_buttons_div" class="cdr-buttons-class" style="display: none;">
+	      		<button id='cdr-button-cancel'>Cancel</button>
+	      		<button id='cdr-button-submit'>Submit</button>
 	      	</div>
 
 	<!--</form>-->
