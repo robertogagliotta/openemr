@@ -54,7 +54,7 @@
 			$("#cdr_rules").empty();
 			
 			if (selected_plan != 'select_plan') {
-				$("#cdr_buttons_div").show();	
+				$("#cdr_hide_show-div").show();	
 
 			    $.post
 			    	(
@@ -82,16 +82,16 @@
 							}								
 						});
 
-				        $("#cdr_rules_select").multiselect();
+				        $("#cdr_rules_select").multiselect({dividerLocation: 0.45});
 			     	});	
 		     				    
 			} else {
-				$("#cdr_buttons_div").hide();
+				$("#cdr_hide_show-div").hide();
 			}		
 		});
 		
 	});
-
+	
 	$("#cdr-button-cancel").click();
 	$("#cdr-button-submit").click();
     
@@ -101,7 +101,7 @@
 	<br/>
 	<div><b>View Rules Plan Mappings</b></div>
 	
-	<div class="cdr-form">
+	<div id="cdr_mappings_form-div" class="cdr-form">
 		<!--<form action="library/RulesPlanMappingEventHandlers.php?action=commitChanges" method="post">-->
 			<div class="cdr-plans">
 				Plan:
@@ -111,12 +111,17 @@
 					<option value="add_new_plan">ADD NEW PLAN</option>
 				</select>
 			</div>	
-	
-			<div id="cdr_rules" class="cdr-rules-class"></div>   	
-	      	
-	      	<div id="cdr_buttons_div" class="cdr-buttons-class" style="display: none;">
-	      		<button id='cdr-button-cancel'>Cancel</button>
-	      		<button id='cdr-button-submit'>Submit</button>
+			<div id="cdr_hide_show-div" style="display: none;">
+				<div class="plan-status_div">
+					<label class="plan-status-label">Status:</label>
+				</div>
+		
+				<div id="cdr_rules" class="cdr-rules-class"></div>   	
+		      	
+		      	<div id="cdr_buttons_div" class="cdr-buttons-class">
+		      		<button id='cdr-button-cancel'>Cancel</button>
+		      		<button id='cdr-button-submit'>Submit</button>
+		      	</div>
 	      	</div>
 
 	<!--</form>-->
