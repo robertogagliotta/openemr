@@ -76,8 +76,8 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	echo ']';
 	
 } else if ($_GET["action"] == "commitChanges") {
-	//print_r($_POST['cdr_rules_select']);
-	//echo '1' . library_dir();
+	$message = "wrong answer";
+	echo "<script type='text/javascript'>alert('$message');</script>";
 
 }
 
