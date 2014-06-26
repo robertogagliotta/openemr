@@ -76,7 +76,7 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	echo ']';
 	
 } else if ($_GET["action"] == "commitChanges") {
-	$message = "wrong answer";
+	$message = "test";
 	echo "<script type='text/javascript'>alert('$message');</script>";
 
 }
