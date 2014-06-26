@@ -7,9 +7,9 @@
 // of the License, or (at your option) any later version.
 ?>
 
-<link type="text/css" rel="stylesheet" href="<?php echo '/library/css/jquery-ui-1.8.21.custom.css' ?>" />
-<link type="text/css" rel="stylesheet" href="<?php css_src('/cdr-multiselect/common.css') ?>" />
-<link type="text/css" rel="stylesheet" href="<?php css_src('/cdr-multiselect/ui.multiselect.css') ?>" />
+<link type="text/css" rel="stylesheet" href="<?php echo $GLOBALS['webroot'] . '/library/css/jquery-ui-1.8.21.custom.css'?>" />
+<link type="text/css" rel="stylesheet" href="<?php css_src('cdr-multiselect/common.css') ?>" />
+<link type="text/css" rel="stylesheet" href="<?php css_src('cdr-multiselect/ui.multiselect.css') ?>" />
 
 <style type="text/css">
  	.cdr-mappings
@@ -89,18 +89,51 @@
 				$("#cdr_hide_show-div").hide();
 			}		
 		});
+
+		$("#cdr-status-deactivate").click(function() {
+			$("#cdr-status-deactivate").attr("disabled", true);
+			$("#cdr-status-activate").removeAttr("disabled");
+		});
+
+		$("#cdr-status-activate").click(function() {
+			$("#cdr-status-activate").attr("disabled", true);
+			$("#cdr-status-deactivate").removeAttr("disabled");
+		});
+
+		$("#cdr-button-cancel").click(function() {
+			alert('cancel')
+		});
+		
+		$("#cdr-button-submit").click(function() {
+			var postData = 
+            {
+                "bid":"test",
+                "location1":"1"
+            }
+			var dataString = JSON.stringify(postData);
+
+			$.ajax({
+		        type: "POST",
+		        dataType: "json",
+		        url: "<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=commitChanges'; ?>",
+		        data: {myData:dataString},
+		        contentType: "application/json; charset=utf-8",
+		        success: function(data){
+		            alert('Items added');
+		        },
+		        error: function(e){
+		            console.log(e.message);
+		        }
+			});
+		});
 		
 	});
-	
-	$("#cdr-button-cancel").click();
-	$("#cdr-button-submit").click();
-    
 </script>
 
 <div class="cdr-mappings">
 	<br/>
-	<div><b>View Rules Plan Mappings</b></div>
-	
+	<div><b>View Plan Rules</b></div>
+	<br/>
 	<div id="cdr_mappings_form-div" class="cdr-form">
 		<!--<form action="library/RulesPlanMappingEventHandlers.php?action=commitChanges" method="post">-->
 			<div class="cdr-plans">
@@ -114,8 +147,10 @@
 			<div id="cdr_hide_show-div" style="display: none;">
 				<div class="plan-status_div">
 					<label class="plan-status-label">Status:</label>
+					<button id='cdr-status-activate' disabled>Activate</button>
+		      		<button id='cdr-status-deactivate'>Deactivate</button>
 				</div>
-		
+				<br/>
 				<div id="cdr_rules" class="cdr-rules-class"></div>   	
 		      	
 		      	<div id="cdr_buttons_div" class="cdr-buttons-class">
