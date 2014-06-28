@@ -42,14 +42,27 @@
 
 		$("#cdr-status-deactivate").click(function() {
 			$("#cdr-status-deactivate").attr("disabled", true);
-			$("#cdr-status-activate").removeAttr("disabled");
+			$('#cdr-status-deactivate').text('Inactive');
 
-			//TODO: Implement activate button
+			$("#cdr-status-activate").removeAttr("disabled");
+			$('#cdr-status-activate').text('Activate');
+
+			$("#cdr-button-submit").attr('disabled', true); 
+			
+
+			//TODO: Implement deactivate button
 		});
 
 		$("#cdr-status-activate").click(function() {
 			$("#cdr-status-activate").attr("disabled", true);
+			$('#cdr-status-activate').text('Active');
+			
+			
 			$("#cdr-status-deactivate").removeAttr("disabled");
+			$('#cdr-status-deactivate').text('Deactivate');
+
+
+			$("#cdr-button-submit").attr('disabled', false); 
 
 			//TODO: Implement activate button
 		});
@@ -57,6 +70,21 @@
 		$("#cdr-button-cancel").click(function() {
 			if (confirm('Are you sure you want to cancel your changes?')) {
 				$loadRules();
+	        }
+		});
+
+		$("#delete_plan").click(function() {
+			if (confirm('Are you sure you want to delete this plan?')) {
+				var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
+				
+				$.post
+		    	(
+			    	'<?php echo  _base_url() . 
+			    			'/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id='; ?>' + selected_plan								
+				)
+				.success(function(resp) {
+					location.reload();    
+			    });
 	        }
 		});
 		
@@ -81,10 +109,14 @@
 				
 			});
 
+			//Validate
 			if (new_selected.length == 0 && new_unselected.length == 0) {
 				alert('No Changes Detected');
 				return;
-			}
+			} else if (plan_id == 'add_new_plan' && plan_name.length == 0) {
+				alert('Plan Name Missing');
+				return;
+			} 
 
 			$("body").addClass("loading");
 			
@@ -126,7 +158,7 @@
 		
 		if (selected_plan != 'select_plan') {
 			$("#cdr_hide_show-div").show();	
-	
+			$("#delete_plan").show();
 		    $.post
 		    	(
 			    	'<?php echo  _base_url() . 
@@ -156,11 +188,13 @@
 		     	});
 
 		    if (selected_plan == 'add_new_plan') {
+		    	$("#delete_plan").hide();
 				$newPlan();
 			} 
 					    
 		} else {
 			$("#cdr_hide_show-div").hide();
+			$("#delete_plan").hide();
 		}		
 	}
 
@@ -183,12 +217,13 @@
 				<option id="divider" value="divider" disabled/>
 				<option id="add_new_plan" value="add_new_plan">ADD NEW PLAN</option>
 			</select>
+			<input title="Delete Plan" id="delete_plan" class="delete_button" type="image" style="display: none;"/>
 		</div>	
 		<div id="new_plan_container"></div>
 		<div id="cdr_hide_show-div" style="display: none;">
 			<div class="plan-status_div">
 				<label class="plan-status-label">Status:</label>
-				<button id='cdr-status-activate' disabled>Activate</button>
+				<button id='cdr-status-activate' disabled>Active</button>
 	      		<button id='cdr-status-deactivate'>Deactivate</button>
 			</div>
 			<br/>

@@ -37,3 +37,22 @@ body.loading {
 body.loading .modal {
     display: block;
 }
+
+.delete_button { 
+    background-image: url('trash_icon.png');
+    background-position:  0px 0px;
+    background-repeat: no-repeat;
+    width: 18px;
+    height: 16px;
+    border: 0px;
+    background-color: none;
+    cursor: pointer;
+    outline: 0;
+}
+
+.delete_button:hover { 
+	-moz-box-shadow: 0 0 10px #ccc; 
+	-webkit-box-shadow: 0 0 10px #ccc; 
+	box-shadow: 0 0 10px #ccc; 
+	
+}
