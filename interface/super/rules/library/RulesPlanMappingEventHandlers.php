@@ -4,7 +4,6 @@ require_once( dirname(__FILE__) . "/../../../globals.php" );
 require_once( $GLOBALS['srcdir'] . "/log.inc");
 require_once( $GLOBALS['srcdir'] . "/sql.inc");
 
-
 if ($_GET["action"] == "getNonCQMPlans") {
 	$plans = getNonCQMPlans();
 	
@@ -76,9 +75,23 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	echo ']';
 	
 } else if ($_GET["action"] == "commitChanges") {
-	$message = "test";
-	echo "<script type='text/javascript'>alert('$message');</script>";
-
+	$data = json_decode(file_get_contents('php://input'), true);
+	
+	$plan_id = $data['plan_id'];
+	$added_rules = print_r($data['added_rules'], true);
+	$removed_rules = print_r($data['removed_rules'], true);
+	
+	if ($plan_id == 'add_new_plan') {
+		addNewPlan($data['plan_name'], $add);
+	} else {
+		submitChanges($plan_id, $added_rules, $removed_rules);
+	}
+	
+	sleep(5);
+	//$myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
+	//$txt = $data['plan_id'] . ' : ' . $add . ' : ' . $removed;
+	//fwrite($myfile, $txt);
+	//fclose($myfile);
 }
 
 
@@ -138,7 +151,8 @@ function getRulesNotInPlan($plan_id) {
 }
 
 function addNewPlan($plan_name, $plan_rules) {
-	//TODO: implement code to add a new plan with its corresponding rules
+	$plan_id = $string = preg_replace('/\s+/', '', $plan_name);
+
 	
 	return null;
 }
@@ -151,7 +165,7 @@ function togglePlanStatus($plan_id, $isActive) {
 	
 }
 
-function submitChanges($plan_id, $RuleTransactionList) {
+function submitChanges($plan_id, $added_rules, $removed_rules) {
 	
 }
 

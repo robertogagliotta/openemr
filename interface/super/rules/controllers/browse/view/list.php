@@ -25,7 +25,7 @@
         </td>
   </tr>
   <tr>
-        <td class="title"><?php echo out( xl( 'Plan Configuration' ) ); ?></td>
+        <td class="title"><?php echo out( xl( 'Plans Configuration' ) ); ?></td>
         <td>
             <a href="index.php?action=browse!plans_config" class="iframe_medium css_button">
                 <span><?php echo out( xl( 'Go to' ) ); ?></span>
