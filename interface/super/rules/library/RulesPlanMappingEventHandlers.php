@@ -78,11 +78,11 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	$data = json_decode(file_get_contents('php://input'), true);
 	
 	$plan_id = $data['plan_id'];
-	$added_rules = print_r($data['added_rules'], true);
-	$removed_rules = print_r($data['removed_rules'], true);
+	$added_rules = $data['added_rules'];
+	$removed_rules = $data['removed_rules'];
 	
 	if ($plan_id == 'add_new_plan') {
-		addNewPlan($data['plan_name'], $add);
+		addNewPlan($data['plan_name'], $added_rules);
 	} else if (strlen($plan_id) > 0) {
 		submitChanges($plan_id, $added_rules, $removed_rules);
 	}	
@@ -147,13 +147,13 @@ function getRulesNotInPlan($plan_id) {
 function addNewPlan($plan_name, $plan_rules) {
 	$plan_id = strtolower(preg_replace('/\s+/', '_', $plan_name)) . '_plan';
 	
-	//clinical_plans
+	/** clinical_plans **/
 	$sql_st = "INSERT INTO `clinical_plans` (`id`, `pid`, `normal_flag`, `cqm_flag`, `cqm_measure_group`) " . 
 				"VALUES (?, 0, 1, 0, '');";
 	$res = sqlStatement($sql_st, array($plan_id));
 	
 	
-	//list_options
+	/** list_options **/
 	$sql_st = "SELECT MAX(`seq`) AS max_seq " .
 				"FROM `list_options` " .
 				"WHERE `list_id` = 'clinical_plans' " .
@@ -169,12 +169,9 @@ function addNewPlan($plan_name, $plan_rules) {
 				"VALUES ('clinical_plans', ?, ?, ?, 0, 0, '', '', '');";
 	$res = sqlStatement($sql_st, array($plan_id, $plan_name, $max_seq));
 	
+	/** rules **/
+	addRulesToPlan($plan_id, $plan_rules);
 	
-	//rules
-	$sql_st = "INSERT INTO `clinical_plans_rules` (`plan_id`, `rule_id`) " .
-			"VALUES (?, ?);";
-	$res = sqlStatement($sql_st, array($plan_id, 'problem_list_amc'));
-
 	/*
 	sleep(3);
 	$myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
@@ -197,8 +194,34 @@ function togglePlanStatus($plan_id, $isActive) {
 }
 
 function submitChanges($plan_id, $added_rules, $removed_rules) {
-	//TODO:
+	//add
+	if (sizeof($added_rules) > 0) {
+		addRulesToPlan($plan_id, $added_rules);
+	}
 	
+	//remove
+	if (sizeof($removed_rules) > 0) {
+		removeRulesFromPlan($plan_id, $removed_rules);
+	}
+	
+}
+
+function addRulesToPlan($plan_id, $list_of_rules) {
+	$sql_st = "INSERT INTO `clinical_plans_rules` (`plan_id`, `rule_id`) " .
+				"VALUES (?, ?);";
+	
+	foreach ($list_of_rules as $rule) {
+		$res = sqlStatement($sql_st, array($plan_id, $rule));
+	}
+}
+
+function removeRulesFromPlan($plan_id, $list_of_rules) {
+	$sql_st = "DELETE FROM `clinical_plans_rules` " .
+				"WHERE `plan_id` = ? AND `rule_id` = ?;";
+
+	foreach ($list_of_rules as $rule) {
+		$res = sqlStatement($sql_st, array($plan_id, $rule));
+	}
 }
 
 ?>
