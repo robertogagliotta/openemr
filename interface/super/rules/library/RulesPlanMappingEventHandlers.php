@@ -83,15 +83,9 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	
 	if ($plan_id == 'add_new_plan') {
 		addNewPlan($data['plan_name'], $add);
-	} else {
+	} else if (strlen($plan_id) > 0) {
 		submitChanges($plan_id, $added_rules, $removed_rules);
-	}
-	
-	sleep(5);
-	//$myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
-	//$txt = $data['plan_id'] . ' : ' . $add . ' : ' . $removed;
-	//fwrite($myfile, $txt);
-	//fclose($myfile);
+	}	
 }
 
 
@@ -151,21 +145,59 @@ function getRulesNotInPlan($plan_id) {
 }
 
 function addNewPlan($plan_name, $plan_rules) {
-	$plan_id = $string = preg_replace('/\s+/', '', $plan_name);
-
+	$plan_id = strtolower(preg_replace('/\s+/', '_', $plan_name)) . '_plan';
 	
-	return null;
+	//clinical_plans
+	$sql_st = "INSERT INTO `clinical_plans` (`id`, `pid`, `normal_flag`, `cqm_flag`, `cqm_measure_group`) " . 
+				"VALUES (?, 0, 1, 0, '');";
+	$res = sqlStatement($sql_st, array($plan_id));
+	
+	
+	//list_options
+	$sql_st = "SELECT MAX(`seq`) AS max_seq " .
+				"FROM `list_options` " .
+				"WHERE `list_id` = 'clinical_plans' " .
+				"ORDER BY `list_options`.`seq`;";
+	$res = sqlStatement($sql_st, null);
+	$max_seq = 0;
+	while($row = sqlFetchArray($res)) {
+		$max_seq = $row['max_seq'] + 10;
+	}
+	
+	$sql_st = "INSERT INTO `list_options` " .
+				"(`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`) " .
+				"VALUES ('clinical_plans', ?, ?, ?, 0, 0, '', '', '');";
+	$res = sqlStatement($sql_st, array($plan_id, $plan_name, $max_seq));
+	
+	
+	//rules
+	$sql_st = "INSERT INTO `clinical_plans_rules` (`plan_id`, `rule_id`) " .
+			"VALUES (?, ?);";
+	$res = sqlStatement($sql_st, array($plan_id, 'problem_list_amc'));
+
+	/*
+	sleep(3);
+	$myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
+	$txt = $plan_id;
+	fwrite($myfile, $txt);
+	fclose($myfile);
+	*/
+	
+	return $plan_id;
 }
 
 function deletePlan($plan_id) {
+	//TODO:
 	
 }
 
 function togglePlanStatus($plan_id, $isActive) {
+	//TODO:
 	
 }
 
 function submitChanges($plan_id, $added_rules, $removed_rules) {
+	//TODO:
 	
 }
 

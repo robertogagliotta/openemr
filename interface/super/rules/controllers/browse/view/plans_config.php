@@ -36,27 +36,31 @@
 	        });	        
 	    });
 
-		$("#cdr-plans-select").change($loadRules);
+		$("#cdr-plans-select").change(
+			$loadRules
+		);
 
 		$("#cdr-status-deactivate").click(function() {
 			$("#cdr-status-deactivate").attr("disabled", true);
 			$("#cdr-status-activate").removeAttr("disabled");
+
+			//TODO: Implement activate button
 		});
 
 		$("#cdr-status-activate").click(function() {
 			$("#cdr-status-activate").attr("disabled", true);
 			$("#cdr-status-deactivate").removeAttr("disabled");
+
+			//TODO: Implement activate button
 		});
 
 		$("#cdr-button-cancel").click(function() {
-			if (confirm('Are you sure?')) {
+			if (confirm('Are you sure you want to cancel your changes?')) {
 				$loadRules();
 	        }
 		});
 		
-		$("#cdr-button-submit").click(function() {
-			$("body").addClass("loading");
-			
+		$("#cdr-button-submit").click(function() {			
 			var plan_id = $('#cdr-plans-select').find('option:selected').attr('id');
 			var plan_name = "";
 
@@ -76,6 +80,13 @@
 				}
 				
 			});
+
+			if (new_selected.length == 0 && new_unselected.length == 0) {
+				alert('No Changes Detected');
+				return;
+			}
+
+			$("body").addClass("loading");
 			
 			var postData = 
 	            {
@@ -94,6 +105,7 @@
 		        contentType: "application/json; charset=utf-8",
 		        success: function(data){
 		            alert('Update Successful!');
+		            $("body").removeClass("loading");
 		        	location.reload();
 		        },
 		        error: function(e){
@@ -190,6 +202,6 @@
 	</div>
 </div>
 
-<div class="modal"><!-- Place at bottom of page --></div>
+<div class="modal"></div>
 
 
