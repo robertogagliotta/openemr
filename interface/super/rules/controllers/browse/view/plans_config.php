@@ -83,7 +83,12 @@
 			    			'/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id='; ?>' + selected_plan								
 				)
 				.success(function(resp) {
+					alert('Plan Deleted!');
 					location.reload();    
+			    })
+			    .error(function(error) {
+				    console.log(error);
+					alert('Error while deleting the plan!');
 			    });
 	        }
 		});
@@ -91,9 +96,11 @@
 		$("#cdr-button-submit").click(function() {			
 			var plan_id = $('#cdr-plans-select').find('option:selected').attr('id');
 			var plan_name = $('#cdr-plans-select').find('option:selected').text();
+			var is_new_plan = false;
 
 			if (plan_id == 'add_new_plan') {
 				plan_name = $("#new_plan_name").val();
+				is_new_plan = true;
 			}
 			
 			var new_selected = new Array;
@@ -113,7 +120,7 @@
 			if (new_selected.length == 0 && new_unselected.length == 0) {
 				alert('No Changes Detected');
 				return;
-			} else if (plan_id == 'add_new_plan' && plan_name.length == 0) {
+			} else if (is_new_plan && plan_name.length == 0) {
 				alert('Plan Name Missing');
 				return;
 			} 
@@ -136,13 +143,24 @@
 		        data: dataString,
 		        contentType: "application/json; charset=utf-8",
 		        success: function(resp){
-		           	alert('Update Successful!');
-       
-		            $("body").removeClass("loading");
-		        	location.reload();
+			        if (is_new_plan) {
+			           	alert('Plan Added Successfully!');
+			           	location.reload();
+			           	
+			        } else {
+			           	alert('Plan Updated Successfully!');
+			            $("body").removeClass("loading");
+			            $loadRules(plan_id);
+			        }
 		        },
-		        error: function(e){
-		            console.log(e.message);
+		        error: function(xhr, status, e){
+		            console.log(xhr);
+		            if (is_new_plan) {
+			           	alert('Error while adding new plan!');			           	
+			        } else {
+			           	alert('Error while updating the plan!');
+			        }
+			        
 		            $("body").removeClass("loading");
 		        }
 			});			
@@ -237,5 +255,3 @@
 </div>
 
 <div class="modal"></div>
-
-

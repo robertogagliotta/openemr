@@ -83,7 +83,11 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	$plan_name = $data['plan_name'];
 	
 	if ($plan_id == 'add_new_plan') {
-		$plan_id = addNewPlan($plan_name, $added_rules);
+		try {
+			$plan_id = addNewPlan($plan_name, $added_rules);
+		} catch (Exception $e) {
+			die ($e);
+		}
 	} else if (strlen($plan_id) > 0) {
 		submitChanges($plan_id, $added_rules, $removed_rules);
 	}	
@@ -95,7 +99,7 @@ if ($_GET["action"] == "getNonCQMPlans") {
 }
 
 
-
+//Helper Functions
 function getNonCQMPlans() {	
 	$plans = array();
 	
@@ -151,36 +155,37 @@ function getRulesNotInPlan($plan_id) {
 }
 
 function addNewPlan($plan_name, $plan_rules) {
-	//$plan_id = strtolower(preg_replace('/\s+/', '_', $plan_name)) . '_plan';
-	
-	/** plan_id start **/
-	$plan_id = 1;
-	$sql_st = "SELECT MAX(SUBSTR(clin_plans.id, 1, LOCATE('_plan', clin_plans.id)-1)) as max_planid " .
-				"FROM `clinical_plans` clin_plans " .
-				"WHERE clin_plans.id like '%_plan' AND SUBSTR(clin_plans.id, 1, LOCATE('_plan', clin_plans.id)) REGEXP '[0-9]+'; ";
-	$res = sqlStatement($sql_st, null);
-	
-	if ($res != NULL) {
-		while($row = sqlFetchArray($res)) {
-			$plan_id = $row['max_planid'];
-		}
-		$plan_id += 1;
+	//Validate if plan name already exists
+	$sql_st = "SELECT `option_id` " .
+				"FROM `list_options` " .
+				"WHERE `list_id` = 'clinical_plans' AND `title` = ?;";
+	$res = sqlStatement($sql_st, array($plan_name));
+	$row = sqlFetchArray($res);
+	if ($row['option_id'] != NULL) {
+		throw new Exception("Plan Name: " . $plan_name . " already exists!");
 	}
 	
-	$plan_id = $plan_id . '_plan';
+	//Generate Plan Id
+	$plan_id = generatePlanID();
 	
-	/** plan_id end **/
 	
+	//Validate if plan id already exists in list options table
+	$sql_st = "SELECT `option_id` " .
+				"FROM `list_options` " .
+				"WHERE `option_id` = ?;";
+	$res = sqlStatement($sql_st, array($plan_id));
+	$row = sqlFetchArray($res);
+	if ($row != NULL) {
+		throw new Exception("Plan Id: " . $plan_id . " already exists in the list_options table!");
+	}	
 	
-	/** clinical_plans start **/
+	//Add plan into clinical_plans table
 	$sql_st = "INSERT INTO `clinical_plans` (`id`, `pid`, `normal_flag`, `cqm_flag`, `cqm_measure_group`) " . 
 				"VALUES (?, 0, 1, 0, '');";
-	$res = sqlStatement($sql_st, array($plan_id));
-	
-	/** clinical_plans end **/
+	$res = sqlStatement($sql_st, array($plan_id));	
 	
 	
-	/** list_options start **/
+	//Get sequence value
 	$sql_st = "SELECT MAX(`seq`) AS max_seq " .
 				"FROM `list_options` " .
 				"WHERE `list_id` = 'clinical_plans'; ";
@@ -194,15 +199,15 @@ function addNewPlan($plan_name, $plan_rules) {
 		$max_seq += 10;
 	}
 	
+	
+	//Insert plan into list_options table
 	$sql_st = "INSERT INTO `list_options` " .
 				"(`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`) " .
 				"VALUES ('clinical_plans', ?, ?, ?, 0, 0, '', '', '');";
-	$res = sqlStatement($sql_st, array($plan_id, $plan_name, $max_seq));
-	
-	/** list_options end **/
+	$res = sqlStatement($sql_st, array($plan_id, $plan_name, $max_seq));	
 	
 	
-	/** rules start **/
+	//Add rules to plan
 	addRulesToPlan($plan_id, $plan_rules);
 	
 	/*
@@ -261,6 +266,27 @@ function removeRulesFromPlan($plan_id, $list_of_rules) {
 	foreach ($list_of_rules as $rule) {
 		$res = sqlStatement($sql_st, array($plan_id, $rule));
 	}
+}
+
+function generatePlanID() {
+	//$plan_id = strtolower(preg_replace('/\s+/', '_', $plan_name)) . '_plan';
+	
+	$plan_id = 1;
+	$sql_st = "SELECT MAX(SUBSTR(clin_plans.id, 1, LOCATE('_plan', clin_plans.id)-1)) as max_planid " .
+			"FROM `clinical_plans` clin_plans " .
+			"WHERE clin_plans.id like '%_plan' AND SUBSTR(clin_plans.id, 1, LOCATE('_plan', clin_plans.id)) REGEXP '[0-9]+'; ";
+	$res = sqlStatement($sql_st, null);
+	
+	if ($res != NULL) {
+		while($row = sqlFetchArray($res)) {
+			$plan_id = $row['max_planid'];
+		}
+		$plan_id += 1;
+	}
+	
+	$plan_id = $plan_id . '_plan';
+	
+	return $plan_id;
 }
 
 ?>
