@@ -36,9 +36,9 @@
 	        });	        
 	    });
 
-		$("#cdr-plans-select").change(
-			$loadRules
-		);
+		$("#cdr-plans-select").change(function() {
+			$loadRules($('#cdr-plans-select').find('option:selected').attr('id'));
+		});
 
 		$("#cdr-status-deactivate").click(function() {
 			$("#cdr-status-deactivate").attr("disabled", true);
@@ -69,7 +69,7 @@
 
 		$("#cdr-button-cancel").click(function() {
 			if (confirm('Are you sure you want to cancel your changes?')) {
-				$loadRules();
+				$loadRules($('#cdr-plans-select').find('option:selected').attr('id'));
 	        }
 		});
 
@@ -90,7 +90,7 @@
 		
 		$("#cdr-button-submit").click(function() {			
 			var plan_id = $('#cdr-plans-select').find('option:selected').attr('id');
-			var plan_name = "";
+			var plan_name = $('#cdr-plans-select').find('option:selected').text();
 
 			if (plan_id == 'add_new_plan') {
 				plan_name = $("#new_plan_name").val();
@@ -135,8 +135,9 @@
 		        url: "<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=commitChanges'; ?>",
 		        data: dataString,
 		        contentType: "application/json; charset=utf-8",
-		        success: function(data){
-		            alert('Update Successful!');
+		        success: function(resp){
+		           	alert('Update Successful!');
+       
 		            $("body").removeClass("loading");
 		        	location.reload();
 		        },
@@ -144,21 +145,18 @@
 		            console.log(e.message);
 		            $("body").removeClass("loading");
 		        }
-			});
-			
+			});			
 		});
-		
 	});
 
-	$loadRules = function(){
-		var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
-		
+	$loadRules = function(selected_plan){		
 		$("#cdr_rules").empty(selected_plan);
 		$('#new_plan_container').empty();
 		
 		if (selected_plan != 'select_plan') {
 			$("#cdr_hide_show-div").show();	
 			$("#delete_plan").show();
+			$("body").addClass("loading");
 		    $.post
 		    	(
 			    	'<?php echo  _base_url() . 
@@ -185,6 +183,7 @@
 					});
 	
 			        $("#cdr_rules_select").multiselect({dividerLocation: 0.45});
+		            $("body").removeClass("loading");
 		     	});
 
 		    if (selected_plan == 'add_new_plan') {

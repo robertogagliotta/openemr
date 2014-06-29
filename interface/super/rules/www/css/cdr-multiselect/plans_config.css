@@ -42,12 +42,12 @@ body.loading .modal {
     background-image: url('trash_icon.png');
     background-position:  0px 0px;
     background-repeat: no-repeat;
-    width: 18px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     border: 0px;
     background-color: none;
     cursor: pointer;
-    outline: 0;
+    outline: 1;
 }
 
 .delete_button:hover { 

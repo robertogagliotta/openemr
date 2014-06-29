@@ -80,12 +80,15 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	$plan_id = $data['plan_id'];
 	$added_rules = $data['added_rules'];
 	$removed_rules = $data['removed_rules'];
+	$plan_name = $data['plan_name'];
 	
 	if ($plan_id == 'add_new_plan') {
-		addNewPlan($data['plan_name'], $added_rules);
+		$plan_id = addNewPlan($plan_name, $added_rules);
 	} else if (strlen($plan_id) > 0) {
 		submitChanges($plan_id, $added_rules, $removed_rules);
 	}	
+	
+	echo '{ "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
 	
 } else if ($_GET["action"] == "deletePlan") {
 	deletePlan($_GET["plan_id"]);
