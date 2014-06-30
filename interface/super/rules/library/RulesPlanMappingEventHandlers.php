@@ -3,117 +3,137 @@
 require_once( dirname(__FILE__) . "/../../../globals.php" );
 require_once( $GLOBALS['srcdir'] . "/log.inc");
 require_once( $GLOBALS['srcdir'] . "/sql.inc");
-if ($_GET["action"] == "getNonCQMPlans") {
-	$plans = getNonCQMPlans();
+
+$action = $_GET["action"];
+switch ($action) {
+	case "getNonCQMPlans":
+		$plans = getNonCQMPlans();
+		
+		echo '[';
+		$i = 0;
+		foreach ($plans as $key => $value) {
+			if ($i > 0) {
+				echo ", ";
+			}
+		
+			echo '{ "plan_id":"' . $key . '" , "plan_title":"' . $value . '" }';
+			$i++;
+		}
+		echo ']';
+		
+		break;
+		
+	case "getRulesOfPlan":
+		$rules = getRulesInPlan($_GET["plan_id"]);
+		
+		echo '[';
+		$i = 0;
+		foreach ($rules as $key => $value) {
+			if ($i > 0) {
+				echo ", ";
+			}
+		
+			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
+			$i++;
+		}
+		echo ']';
+		
+		break;
 	
-	echo '[';
-	$i = 0;
-	foreach ($plans as $key => $value) {
-		if ($i > 0) {
-			echo ", ";
+	case "getRulesNotInPlan":
+		$rules = getRulesNotInPlan($_GET["plan_id"]);
+		
+		echo '[';
+		$i = 0;
+		foreach ($rules as $key => $value) {
+			if ($i > 0) {
+				echo ", ";
+			}
+		
+			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
+			$i++;
+		}
+		echo ']';
+		
+		break;
+		
+	case "getRulesInAndNotInPlan":
+		$rules = getRulesInPlan($_GET["plan_id"]);
+		
+		echo '[';
+		
+		$i = 0;
+		foreach ($rules as $key => $value) {
+			if ($i > 0) {
+				echo ", ";
+			}
+		
+			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"true" }';
+			$i++;
 		}
 		
-		echo '{ "plan_id":"' . $key . '" , "plan_title":"' . $value . '" }';
-		$i++;
-	}
-	echo ']';
-} else if ($_GET["action"] == "getRulesOfPlan") {
-	$rules = getRulesInPlan($_GET["plan_id"]);
-	
-	echo '[';
-	$i = 0;
-	foreach ($rules as $key => $value) {
-		if ($i > 0) {
-			echo ", ";
-		}
-	
-		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
-		$i++;
-	}
-	echo ']';
-} else if ($_GET["action"] == "getRulesNotInPlan") {
-	$rules = getRulesNotInPlan($_GET["plan_id"]);
-	
-	echo '[';
-	$i = 0;
-	foreach ($rules as $key => $value) {
-		if ($i > 0) {
-			echo ", ";
-		}
-	
-		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
-		$i++;
-	}
-	echo ']';
-	
-} else if ($_GET["action"] == "getRulesInAndNotInPlan") {
-	$rules = getRulesInPlan($_GET["plan_id"]);
-
-	echo '[';
-	
-	$i = 0;
-	foreach ($rules as $key => $value) {
-		if ($i > 0) {
-			echo ", ";
-		}
-
-		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"true" }';
-		$i++;
-	}
-	
-	$rules = getRulesNotInPlan($_GET["plan_id"]);
-	foreach ($rules as $key => $value) {
-		if ($i > 0) {
-			echo ", ";
-		}
-	
-		echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"false" }';
-		$i++;
-	}
-	
-	echo ']';
-	
-} else if ($_GET["action"] == "commitChanges") {	
-	$data = json_decode(file_get_contents('php://input'), true);
-	
-	$plan_id = $data['plan_id'];
-	$added_rules = $data['added_rules'];
-	$removed_rules = $data['removed_rules'];
-	$plan_name = $data['plan_name'];
-	
-	if ($plan_id == 'add_new_plan') {
-		try {
-			$plan_id = addNewPlan($plan_name, $added_rules);
-		} catch (Exception $e) {
-			if ($e->getMessage() == "002") {
-				//Plan Name Taken
-				echo '{ "status_code":"002", "status_message":"' . "Plan Name Already Exists!" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
-			
-			} else if ($e->getMessage() == "003") {
-				//Already in list options
-				echo '{ "status_code":"003", "status_message":"' . "Plan Already in list_options" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
-			
-			} else {
-				echo '{ "status_code":"001", "status_message":"' . $e->getMessage() . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+		$rules = getRulesNotInPlan($_GET["plan_id"]);
+		foreach ($rules as $key => $value) {
+			if ($i > 0) {
+				echo ", ";
 			}
-			
-			return;
+		
+			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"false" }';
+			$i++;
 		}
-	} else if (strlen($plan_id) > 0) {
-		submitChanges($plan_id, $added_rules, $removed_rules);
-	}	
-	
-	echo '{ "status_code":"000", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
-	
-} else if ($_GET["action"] == "deletePlan") {	
-	deletePlan($_GET["plan_id"]);
-	
-} else if ($_GET["action"] == "getPlanStatus") {
-	$plan_id = $_GET["plan_id"];
-	$plan_status = getPlanStatus($plan_id);
-	
-	echo '{ "plan_id":"' . $plan_id . '" , "plan_status":"' . $plan_status . '" }';
-	
+		
+		echo ']';
+		
+		break;
+		
+	case "commitChanges":
+		$data = json_decode(file_get_contents('php://input'), true);
+		
+		$plan_id = $data['plan_id'];
+		$added_rules = $data['added_rules'];
+		$removed_rules = $data['removed_rules'];
+		$plan_name = $data['plan_name'];
+		
+		if ($plan_id == 'add_new_plan') {
+			try {
+				$plan_id = addNewPlan($plan_name, $added_rules);
+			} catch (Exception $e) {
+				if ($e->getMessage() == "002") {
+					//Plan Name Taken
+					echo '{ "status_code":"002", "status_message":"' . "Plan Name Already Exists!" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+						
+				} else if ($e->getMessage() == "003") {
+					//Already in list options
+					echo '{ "status_code":"003", "status_message":"' . "Plan Already in list_options" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+						
+				} else {
+					echo '{ "status_code":"001", "status_message":"' . $e->getMessage() . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+				}
+					
+				break;
+			}
+		} else if (strlen($plan_id) > 0) {
+			submitChanges($plan_id, $added_rules, $removed_rules);
+		}
+		
+		echo '{ "status_code":"000", "status_message":"' . "Success" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+		
+		break;
+		
+	case "deletePlan":
+		deletePlan($_GET["plan_id"]);
+		
+		break;
+		
+	case "getPlanStatus":
+		$plan_id = $_GET["plan_id"];
+		$plan_status = getPlanStatus($plan_id);
+		echo '{ "plan_id":"' . $plan_id . '" , "plan_status":"' . $plan_status . '" }';
+		
+		break;
+		
+	default:
+		break;
 }
 
 
