@@ -3,7 +3,6 @@
 require_once( dirname(__FILE__) . "/../../../globals.php" );
 require_once( $GLOBALS['srcdir'] . "/log.inc");
 require_once( $GLOBALS['srcdir'] . "/sql.inc");
-
 if ($_GET["action"] == "getNonCQMPlans") {
 	$plans = getNonCQMPlans();
 	
@@ -74,7 +73,7 @@ if ($_GET["action"] == "getNonCQMPlans") {
 	
 	echo ']';
 	
-} else if ($_GET["action"] == "commitChanges") {
+} else if ($_GET["action"] == "commitChanges") {	
 	$data = json_decode(file_get_contents('php://input'), true);
 	
 	$plan_id = $data['plan_id'];
@@ -86,16 +85,35 @@ if ($_GET["action"] == "getNonCQMPlans") {
 		try {
 			$plan_id = addNewPlan($plan_name, $added_rules);
 		} catch (Exception $e) {
-			die ($e);
+			if ($e->getMessage() == "002") {
+				//Plan Name Taken
+				echo '{ "status_code":"002", "status_message":"' . "Plan Name Already Exists!" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+			
+			} else if ($e->getMessage() == "003") {
+				//Already in list options
+				echo '{ "status_code":"003", "status_message":"' . "Plan Already in list_options" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+			
+			} else {
+				echo '{ "status_code":"001", "status_message":"' . $e->getMessage() . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+			}
+			
+			return;
 		}
 	} else if (strlen($plan_id) > 0) {
 		submitChanges($plan_id, $added_rules, $removed_rules);
 	}	
 	
-	echo '{ "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+	echo '{ "status_code":"000", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
 	
-} else if ($_GET["action"] == "deletePlan") {
+} else if ($_GET["action"] == "deletePlan") {	
 	deletePlan($_GET["plan_id"]);
+	
+} else if ($_GET["action"] == "getPlanStatus") {
+	$plan_id = $_GET["plan_id"];
+	$plan_status = getPlanStatus($plan_id);
+	
+	echo '{ "plan_id":"' . $plan_id . '" , "plan_status":"' . $plan_status . '" }';
+	
 }
 
 
@@ -162,7 +180,7 @@ function addNewPlan($plan_name, $plan_rules) {
 	$res = sqlStatement($sql_st, array($plan_name));
 	$row = sqlFetchArray($res);
 	if ($row['option_id'] != NULL) {
-		throw new Exception("Plan Name: " . $plan_name . " already exists!");
+		throw new Exception("002");
 	}
 	
 	//Generate Plan Id
@@ -176,7 +194,8 @@ function addNewPlan($plan_name, $plan_rules) {
 	$res = sqlStatement($sql_st, array($plan_id));
 	$row = sqlFetchArray($res);
 	if ($row != NULL) {
-		throw new Exception("Plan Id: " . $plan_id . " already exists in the list_options table!");
+		//001 = plan name taken
+		throw new Exception("003");
 	}	
 	
 	//Add plan into clinical_plans table
@@ -287,6 +306,21 @@ function generatePlanID() {
 	$plan_id = $plan_id . '_plan';
 	
 	return $plan_id;
+}
+
+function getPlanStatus($plan_id) {
+	$sql_st = "SELECT `normal_flag` " . 
+				"FROM `clinical_plans` " . 
+				"WHERE `id` = ?;";
+	
+	$res = sqlStatement($sql_st, array($plan_id));
+	
+	$row = sqlFetchArray($res);
+	if ($row['normal_flag'] == 1) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 ?>

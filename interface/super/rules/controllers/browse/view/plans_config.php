@@ -36,46 +36,37 @@
 	        });	        
 	    });
 
+	    //Change selected plan
 		$("#cdr-plans-select").change(function() {
 			$loadRules($('#cdr-plans-select').find('option:selected').attr('id'));
 		});
 
+		//Deactivate Plan
 		$("#cdr-status-deactivate").click(function() {
-			$("#cdr-status-deactivate").attr("disabled", true);
-			$('#cdr-status-deactivate').text('Inactive');
+			$deactivatePlan();
+			$togglePlanStatus(false);
 
-			$("#cdr-status-activate").removeAttr("disabled");
-			$('#cdr-status-activate').text('Activate');
-
-			$("#cdr-button-submit").attr('disabled', true); 
-			
-
-			//TODO: Implement deactivate button
 		});
 
+		//Activate Plan
 		$("#cdr-status-activate").click(function() {
-			$("#cdr-status-activate").attr("disabled", true);
-			$('#cdr-status-activate').text('Active');
-			
-			
-			$("#cdr-status-deactivate").removeAttr("disabled");
-			$('#cdr-status-deactivate').text('Deactivate');
+			$activatePlan();
+			$togglePlanStatus(true);
 
-
-			$("#cdr-button-submit").attr('disabled', false); 
-
-			//TODO: Implement activate button
 		});
 
+		//Cancel
 		$("#cdr-button-cancel").click(function() {
 			if (confirm('Are you sure you want to cancel your changes?')) {
 				$loadRules($('#cdr-plans-select').find('option:selected').attr('id'));
 	        }
 		});
 
+		//Delete Plan
 		$("#delete_plan").click(function() {
 			if (confirm('Are you sure you want to delete this plan?')) {
 				var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
+				$("body").addClass("loading");
 				
 				$.post
 		    	(
@@ -83,22 +74,31 @@
 			    			'/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id='; ?>' + selected_plan								
 				)
 				.success(function(resp) {
-					alert('Plan Deleted!');
+					//alert('Plan Deleted!');
+					$("body").removeClass("loading");
 					location.reload();    
 			    })
 			    .error(function(error) {
 				    console.log(error);
 					alert('Error while deleting the plan!');
-			    });
+					$("body").removeClass("loading");
+			    });			    
 	        }
 		});
-		
+
+		//Submit Changes
 		$("#cdr-button-submit").click(function() {			
 			var plan_id = $('#cdr-plans-select').find('option:selected').attr('id');
 			var plan_name = $('#cdr-plans-select').find('option:selected').text();
 			var is_new_plan = false;
 
 			if (plan_id == 'add_new_plan') {
+				//reset
+				$('#new_plan_name')
+					.css({'border-color':'',
+							'border-width':''
+					});
+				
 				plan_name = $("#new_plan_name").val();
 				is_new_plan = true;
 			}
@@ -122,6 +122,11 @@
 				return;
 			} else if (is_new_plan && plan_name.length == 0) {
 				alert('Plan Name Missing');
+				$('#new_plan_name')
+					.css({'border-color':'red',
+							'border-width':'3px'
+								});
+				$('#new_plan_name').focus();
 				return;
 			} 
 
@@ -135,35 +140,61 @@
 	                "plan_name" : plan_name
 	            }
 			var dataString = JSON.stringify(postData);
-			
-			$.ajax({
-		        type: "POST",
-		        dataType: "json",
-		        url: "<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=commitChanges'; ?>",
-		        data: dataString,
-		        contentType: "application/json; charset=utf-8",
-		        success: function(resp){
-			        if (is_new_plan) {
+
+			$.post( 
+				'<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=commitChanges'; ?>', 
+				dataString)
+			.success(function(resp) {
+				var obj = $.parseJSON(resp);
+				if (obj.status_code == '000') {
+					//Success
+					if (is_new_plan) {    	
+			           	$('<option id="' + obj.plan_id + '" value="' + obj.plan_id + '">' + obj.plan_title + '</option>')
+		        			.insertAfter('#select_plan')
+		        			.insertBefore('#divider')
+		        			.attr("selected","selected");
+	        			plan_id = obj.plan_id;
+
 			           	alert('Plan Added Successfully!');
-			           	location.reload();
-			           	
+	        		
 			        } else {
 			           	alert('Plan Updated Successfully!');
-			            $("body").removeClass("loading");
-			            $loadRules(plan_id);
 			        }
-		        },
-		        error: function(xhr, status, e){
-		            console.log(xhr);
+
+		            $loadRules(plan_id);
+		            
+				} else if (obj.status_code == '001') {
+					alert('Unknown Error');
+
+				} else if (obj.status_code == '002') {
+					alert('Plan Name Already Taken!');
+					$('#new_plan_name')
+						.css({'border-color':'red',
+							'border-width':'3px'
+						});
+					$('#new_plan_name').focus();
+				} else {
+					//Error
+					console.log(obj.status_message);
 		            if (is_new_plan) {
 			           	alert('Error while adding new plan!');			           	
 			        } else {
 			           	alert('Error while updating the plan!');
-			        }
-			        
-		            $("body").removeClass("loading");
+			        }					
+				}
+
+	            $("body").removeClass("loading");
+			})
+			.error(function(e) {
+				console.log(e);
+	            if (is_new_plan) {
+		           	alert('Error while adding new plan!');			           	
+		        } else {
+		           	alert('Error while updating the plan!');
 		        }
-			});			
+
+	            $("body").removeClass("loading");	
+			});	
 		});
 	});
 
@@ -172,9 +203,21 @@
 		$('#new_plan_container').empty();
 		
 		if (selected_plan != 'select_plan') {
+			$("body").addClass("loading");
+			
 			$("#cdr_hide_show-div").show();	
 			$("#delete_plan").show();
-			$("body").addClass("loading");
+			$("#plan_status_div").show();
+
+		    if (selected_plan == 'add_new_plan') {
+		    	$("#delete_plan").hide();
+				$("#plan_status_div").hide();
+		    	$newPlan();
+				
+			} else {
+				$loadPlanStatus(selected_plan);
+			}
+			
 		    $.post
 		    	(
 			    	'<?php echo  _base_url() . 
@@ -202,23 +245,79 @@
 	
 			        $("#cdr_rules_select").multiselect({dividerLocation: 0.45});
 		            $("body").removeClass("loading");
-		     	});
-
-		    if (selected_plan == 'add_new_plan') {
-		    	$("#delete_plan").hide();
-				$newPlan();
-			} 
-					    
+		     	});    
 		} else {
 			$("#cdr_hide_show-div").hide();
 			$("#delete_plan").hide();
 		}		
 	}
 
+	$loadPlanStatus = function(selected_plan) {
+		$.post
+    	(
+	    	'<?php echo  _base_url() . 
+	    			'/library/RulesPlanMappingEventHandlers.php?action=getPlanStatus&plan_id='; ?>' + selected_plan
+		)
+		.success(function(resp) {
+			var obj = $.parseJSON(resp);
+
+			if (obj.plan_status) {
+				$activatePlan();
+			} else {
+				$deactivatePlan();
+			}
+			 
+	    })
+	    .error(function(error) {
+		    console.log(error);
+			alert('Error');
+	    });
+
+	}
+
 	$newPlan = function() {
 		$('#new_plan_container')
 			.append('<label>Plan Name: </label>')
 			.append('<input id="new_plan_name" type="text" name="new_plan_name">');
+	}
+
+	$togglePlanStatus = function (isActive) {
+		var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
+		
+		$.post
+    	(
+	    	'<?php echo  _base_url() . 
+	    			'/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus&plan_id='; ?>' + selected_plan
+	    			+ '&plan_status=' + isActive					
+		)
+		.success(function(resp) {
+			 
+	    })
+	    .error(function(error) {
+		    console.log(error);
+			alert('Error');
+	    });
+	}
+
+	$activatePlan = function() {
+		$("#cdr-status-activate").attr("disabled", true);
+		$('#cdr-status-activate').text('Active');
+		
+		$("#cdr-status-deactivate").removeAttr("disabled");
+		$('#cdr-status-deactivate').text('Deactivate');
+
+
+		$("#cdr-button-submit").attr('disabled', false); 
+	}
+
+	$deactivatePlan = function() {
+		$("#cdr-status-deactivate").attr("disabled", true);
+		$('#cdr-status-deactivate').text('Inactive');
+
+		$("#cdr-status-activate").removeAttr("disabled");
+		$('#cdr-status-activate').text('Activate');
+
+		$("#cdr-button-submit").attr('disabled', true); 
 	}
 </script>
 
@@ -238,7 +337,7 @@
 		</div>	
 		<div id="new_plan_container"></div>
 		<div id="cdr_hide_show-div" style="display: none;">
-			<div class="plan-status_div">
+			<div id="plan_status_div" class="plan-status_div">
 				<label class="plan-status-label">Status:</label>
 				<button id='cdr-status-activate' disabled>Active</button>
 	      		<button id='cdr-status-deactivate'>Deactivate</button>
