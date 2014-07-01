@@ -283,12 +283,17 @@
 
 	$togglePlanStatus = function (isActive) {
 		var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
+		var action = 'activate';
+
+		if (!isActive) {
+			action = 'deactivate';
+		} 
 		
 		$.post
     	(
 	    	'<?php echo  _base_url() . 
 	    			'/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus&plan_id='; ?>' + selected_plan
-	    			+ '&plan_status=' + isActive					
+	    			+ '&plan_status=' + action					
 		)
 		.success(function(resp) {
 			 
