@@ -143,7 +143,7 @@ if (!empty($_POST['form_submit'])) {
 
 ?>
 <center>
-<form method='post' action='sql_upgrade_improve2_clean.php'>
+<form method='post' action='sql_upgrade.php'>
 <?php
 if ($valid_version_flag === FALSE) {
     echo "***  The version_override in the url is invalid ****<br>";
