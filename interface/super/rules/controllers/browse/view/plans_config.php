@@ -30,7 +30,7 @@
 	        var data = $.parseJSON(resp);
 
 	        $.each(data, function(idx, obj) {
-	        	$('<option id="' + obj.plan_id + '" value="' + obj.plan_id + '">' + obj.plan_title + '</option>')
+	        	$('<option id="' + obj.plan_id + '" p_id="' + obj.plan_pid + '" value="' + obj.plan_id + '">' + obj.plan_title + '</option>')
 	        		.insertAfter('#select_plan')
 	        		.insertBefore('#divider');
 	        });	        
@@ -38,7 +38,10 @@
 
 	    //Change selected plan
 		$("#cdr-plans-select").change(function() {
-			$loadRules($('#cdr-plans-select').find('option:selected').attr('id'));
+			$loadRules(
+					$('#cdr-plans-select').find('option:selected').attr('id'), 
+					$('#cdr-plans-select').find('option:selected').attr('p_id')
+			);
 		});
 
 		//Deactivate Plan
@@ -58,7 +61,10 @@
 		//Cancel
 		$("#cdr-button-cancel").click(function() {
 			if (confirm('Are you sure you want to cancel your changes?')) {
-				$loadRules($('#cdr-plans-select').find('option:selected').attr('id'));
+				$loadRules(
+					$('#cdr-plans-select').find('option:selected').attr('id'),
+					$('#cdr-plans-select').find('option:selected').attr('p_id')
+				);
 	        }
 		});
 
@@ -66,12 +72,15 @@
 		$("#delete_plan").click(function() {
 			if (confirm('Are you sure you want to delete this plan?')) {
 				var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
+				var selected_plan_pid = $('#cdr-plans-select').find('option:selected').attr('p_id');
+
 				$("body").addClass("loading");
 				
 				$.post
 		    	(
 			    	'<?php echo  _base_url() . 
-			    			'/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id='; ?>' + selected_plan								
+			    			"/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id="; ?>' + selected_plan
+			    			+ '&plan_pid=' + selected_plan_pid							
 				)
 				.success(function(resp) {
 					//alert('Plan Deleted!');
@@ -161,7 +170,7 @@
 			           	alert('Plan Updated Successfully!');
 			        }
 
-		            $loadRules(plan_id);
+		            $loadRules(plan_id, 0);
 		            
 				} else if (obj.status_code == '001') {
 					alert('Unknown Error');
@@ -198,7 +207,7 @@
 		});
 	});
 
-	$loadRules = function(selected_plan){		
+	$loadRules = function(selected_plan, selected_plan_pid){		
 		$("#cdr_rules").empty(selected_plan);
 		$('#new_plan_container').empty();
 		
@@ -215,7 +224,7 @@
 		    	$newPlan();
 				
 			} else {
-				$loadPlanStatus(selected_plan);
+				$loadPlanStatus(selected_plan, selected_plan_pid);
 			}
 			
 		    $.post
@@ -252,16 +261,17 @@
 		}		
 	}
 
-	$loadPlanStatus = function(selected_plan) {
+	$loadPlanStatus = function(selected_plan, selected_plan_pid) {
 		$.post
     	(
 	    	'<?php echo  _base_url() . 
 	    			'/library/RulesPlanMappingEventHandlers.php?action=getPlanStatus&plan_id='; ?>' + selected_plan
+	    			+ '&plan_pid=' + selected_plan_pid
 		)
 		.success(function(resp) {
 			var obj = $.parseJSON(resp);
 
-			if (obj.plan_status) {
+			if (obj.is_plan_active) {
 				$activatePlan();
 			} else {
 				$deactivatePlan();
@@ -283,6 +293,7 @@
 
 	$togglePlanStatus = function (isActive) {
 		var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
+		var selected_plan_pid = $('#cdr-plans-select').find('option:selected').attr('p_id');
 		var action = 'activate';
 
 		if (!isActive) {
@@ -293,7 +304,7 @@
     	(
 	    	'<?php echo  _base_url() . 
 	    			'/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus&plan_id='; ?>' + selected_plan
-	    			+ '&plan_status=' + action					
+	    			+ '&plan_pid=' + selected_plan_pid + '&plan_status=' + action				
 		)
 		.success(function(resp) {
 			 
