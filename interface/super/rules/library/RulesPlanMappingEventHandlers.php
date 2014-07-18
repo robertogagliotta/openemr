@@ -8,15 +8,15 @@ $action = $_GET["action"];
 switch ($action) {
 	case "getNonCQMPlans":
 		$plans = getNonCQMPlans();
-		
+
 		echo '[';
 		$i = 0;
 		foreach ($plans as $key => $value) {
 			if ($i > 0) {
 				echo ", ";
 			}
-		
-			echo '{ "plan_id":"' . $key . '" , "plan_title":"' . $value . '" }';
+
+			echo '{ "plan_id":"' . $key . '" , "plan_pid":"' . $value[0] . '" , "plan_title":"' . $value[1] . '" }';
 			$i++;
 		}
 		echo ']';
@@ -121,14 +121,21 @@ switch ($action) {
 		break;
 		
 	case "deletePlan":
-		deletePlan($_GET["plan_id"]);
+		$plan_id = $_GET["plan_id"];
+		$plan_pid = $_GET["plan_pid"];
+		deletePlan($plan_id, $plan_pid);
 		
 		break;
 		
 	case "getPlanStatus":
 		$plan_id = $_GET["plan_id"];
-		$plan_status = getPlanStatus($plan_id);
-		echo '{ "plan_id":"' . $plan_id . '" , "plan_status":"' . $plan_status . '" }';
+		$plan_pid = $_GET["plan_pid"];
+		
+		$isPlanActive = isPlanActive($plan_id, $plan_pid);
+		
+		$isPlanActive = ($isPlanActive) ? 1 : 0	;
+
+		echo '{ "plan_id":"' . $plan_id . '" , "plan_pid":"' . $plan_pid . '" , "is_plan_active":' . $isPlanActive . ' }';
 		
 		break;
 		
@@ -141,15 +148,20 @@ switch ($action) {
 function getNonCQMPlans() {	
 	$plans = array();
 	
-	$sql_st = "SELECT DISTINCT list_options.title, clin_plans_rules.plan_id " .
+	$sql_st = "SELECT DISTINCT list_options.title, clin_plans_rules.plan_id, clin_plans.pid " .
 				"FROM `list_options` list_options " . 
+				"JOIN `clinical_plans` clin_plans ON clin_plans.id = list_options.option_id " .				
 				"JOIN `clinical_plans_rules` clin_plans_rules ON clin_plans_rules.plan_id = list_options.option_id " .
 				"JOIN `clinical_rules` clin_rules ON clin_rules.id = clin_plans_rules.rule_id " .
 				"WHERE (clin_rules.cqm_flag = 0 or clin_rules.cqm_flag is NULL) and list_options.list_id = ?;";
 	$result = sqlStatement($sql_st, array('clinical_plans'));
-	
+
 	while($row = sqlFetchArray($result)) {
-		$plans[$row['plan_id']] = $row['title'];
+		$plan_id = $row['plan_id'];
+		$p_id = $row['pid'];
+		$plan_title = $row['title'];
+
+		$plans[$plan_id] = array($p_id, $plan_title);
 	}
 	return $plans;
 }
@@ -260,15 +272,15 @@ function addNewPlan($plan_name, $plan_rules) {
 	return $plan_id;
 }
 
-function deletePlan($plan_id) {
-	$sql_st = "DELETE FROM `clinical_plans` WHERE `clinical_plans`.`id` = ?;";
-	$res = sqlStatement($sql_st, array($plan_id));
+function deletePlan($plan_id, $plan_pid) {
+	$sql_st = "DELETE FROM `clinical_plans` WHERE `clinical_plans`.`id` = ? AND `clinical_plans`.`pid` = ?;";
+	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
 	
 	$sql_st = "DELETE FROM `list_options` WHERE `list_id` = 'clinical_plans' AND `option_id` = ?;";
 	$res = sqlStatement($sql_st, array($plan_id));
 	
 	$sql_st = "DELETE FROM `clinical_plans_rules` WHERE `plan_id` = ?;";
-	$res = sqlStatement($sql_st, array($plan_id));
+	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
 }
 
 function togglePlanStatus($plan_id, $isActive) {
@@ -328,17 +340,17 @@ function generatePlanID() {
 	return $plan_id;
 }
 
-function getPlanStatus($plan_id) {
+function isPlanActive($plan_id, $plan_pid) {
 	$sql_st = "SELECT `normal_flag` " . 
 				"FROM `clinical_plans` " . 
-				"WHERE `id` = ?;";
-	
-	$res = sqlStatement($sql_st, array($plan_id));
-	
+				"WHERE `id` = ? AND `pid` = ?;";
+
+	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
+
 	$row = sqlFetchArray($res);
 	if ($row['normal_flag'] == 1) {
 		return true;
-	} else {
+	} else {		
 		return false;
 	}
 }
