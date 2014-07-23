@@ -9,80 +9,52 @@ switch ($action) {
 	case "getNonCQMPlans":
 		$plans = getNonCQMPlans();
 
-		echo '[';
-		$i = 0;
-		foreach ($plans as $key => $value) {
-			if ($i > 0) {
-				echo ", ";
-			}
-
-			echo '{ "plan_id":"' . $key . '" , "plan_pid":"' . $value[0] . '" , "plan_title":"' . $value[1] . '" }';
-			$i++;
-		}
-		echo ']';
+		echo json_encode($plans);
 		
 		break;
 		
 	case "getRulesOfPlan":
 		$rules = getRulesInPlan($_GET["plan_id"]);
 		
-		echo '[';
-		$i = 0;
+		$rules_list = array();
 		foreach ($rules as $key => $value) {
-			if ($i > 0) {
-				echo ", ";
-			}
-		
-			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
-			$i++;
+			$rule_info = array('rule_id'=>$key, 'rule_title'=>$value);
+			array_push($rules_list,$rule_info);
 		}
-		echo ']';
+		
+		echo json_encode($rules_list);
 		
 		break;
 	
 	case "getRulesNotInPlan":
 		$rules = getRulesNotInPlan($_GET["plan_id"]);
 		
-		echo '[';
-		$i = 0;
+		$rules_list = array();
 		foreach ($rules as $key => $value) {
-			if ($i > 0) {
-				echo ", ";
-			}
-		
-			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" }';
-			$i++;
+			$rule_info = array('rule_id'=>$key, 'rule_title'=>$value);
+			array_push($rules_list,$rule_info);
 		}
-		echo ']';
+		
+		echo json_encode($rules_list);
 		
 		break;
 		
 	case "getRulesInAndNotInPlan":
 		$rules = getRulesInPlan($_GET["plan_id"]);
 		
-		echo '[';
-		
-		$i = 0;
+		$rules_list = array();
 		foreach ($rules as $key => $value) {
-			if ($i > 0) {
-				echo ", ";
-			}
-		
-			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"true" }';
-			$i++;
-		}
+			$rule_info = array('rule_id'=>$key, 'rule_title'=>$value, 'selected'=>'true');
+			array_push($rules_list,$rule_info);
+		}		
 		
 		$rules = getRulesNotInPlan($_GET["plan_id"]);
 		foreach ($rules as $key => $value) {
-			if ($i > 0) {
-				echo ", ";
-			}
-		
-			echo '{ "rule_id":"' . $key . '" , "rule_title":"' . $value . '" , "selected":"false" }';
-			$i++;
+			$rule_info = array('rule_id'=>$key, 'rule_title'=>$value, 'selected'=>'false');
+			array_push($rules_list,$rule_info);
 		}
 		
-		echo ']';
+		echo json_encode($rules_list);
 		
 		break;
 		
@@ -100,15 +72,18 @@ switch ($action) {
 			} catch (Exception $e) {
 				if ($e->getMessage() == "002") {
 					//Plan Name Taken
-					echo '{ "status_code":"002", "status_message":"' . "Plan Name Already Exists!" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+					$status = array('status_code'=>'002', 'status_message'=>'Plan Name Already Exists!', 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
+					echo json_encode($status);
 						
 				} else if ($e->getMessage() == "003") {
 					//Already in list options
-					echo '{ "status_code":"003", "status_message":"' . "Plan Already in list_options" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
-						
+					$status = array('status_code'=>'003', 'status_message'=>'Plan Already in list_options', 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
+					echo json_encode($status);
+											
 				} else {
-					echo '{ "status_code":"001", "status_message":"' . $e->getMessage() . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
-				}
+					$status = array('status_code'=>'001', 'status_message'=>$e->getMessage(), 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
+					echo json_encode($status);
+									}
 					
 				break;
 			}
@@ -116,7 +91,8 @@ switch ($action) {
 			submitChanges($plan_id, $added_rules, $removed_rules);
 		}
 		
-		echo '{ "status_code":"000", "status_message":"' . "Success" . '", "plan_id":"' . $plan_id . '" , "plan_title":"' . $plan_name . '" }';
+		$status = array('status_code'=>'000', 'status_message'=>'Success', 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
+		echo json_encode($status);
 		
 		break;
 		
@@ -134,8 +110,9 @@ switch ($action) {
 		$isPlanActive = isPlanActive($plan_id, $plan_pid);
 		
 		$isPlanActive = ($isPlanActive) ? 1 : 0	;
-
-		echo '{ "plan_id":"' . $plan_id . '" , "plan_pid":"' . $plan_pid . '" , "is_plan_active":' . $isPlanActive . ' }';
+		
+		$plan_status = array('plan_id'=>$plan_id, 'plan_pid'=>$plan_pid, 'is_plan_active'=>$isPlanActive);
+		echo json_encode($plan_status);
 		
 		break;
 		
@@ -153,15 +130,16 @@ function getNonCQMPlans() {
 				"JOIN `clinical_plans` clin_plans ON clin_plans.id = list_options.option_id " .				
 				"JOIN `clinical_plans_rules` clin_plans_rules ON clin_plans_rules.plan_id = list_options.option_id " .
 				"JOIN `clinical_rules` clin_rules ON clin_rules.id = clin_plans_rules.rule_id " .
-				"WHERE (clin_rules.cqm_flag = 0 or clin_rules.cqm_flag is NULL) and list_options.list_id = ?;";
+				"WHERE (clin_rules.cqm_flag = 0 or clin_rules.cqm_flag is NULL) and clin_plans.pid = 0 and list_options.list_id = ?;";
 	$result = sqlStatement($sql_st, array('clinical_plans'));
 
 	while($row = sqlFetchArray($result)) {
 		$plan_id = $row['plan_id'];
-		$p_id = $row['pid'];
+		$plan_pid = $row['pid'];
 		$plan_title = $row['title'];
-
-		$plans[$plan_id] = array($p_id, $plan_title);
+		
+		$plan_info = array('plan_id'=>$plan_id, 'plan_pid'=>$plan_pid, 'plan_title'=>$plan_title);
+		array_push($plans, $plan_info);
 	}
 	return $plans;
 }
