@@ -21,7 +21,8 @@
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
 
 <script type="text/javascript">
-	$(document).ready(function() {		
+	$(document).ready(function() {	
+		//load plans	
 		$("#cdr-plans").load('<?php library_src('RulesPlanMappingEventHandlers.php') ?>');
 		
 	    $.post(
