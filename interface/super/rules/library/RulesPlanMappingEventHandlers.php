@@ -166,7 +166,7 @@ function getRulesNotInPlan($plan_id) {
 	$sql_st = "SELECT lst_opt.option_id as rule_option_id, lst_opt.title as rule_title " .
 				"FROM `clinical_rules` clin_rules " .
 				"JOIN `list_options` lst_opt ON lst_opt.option_id = clin_rules.id " .
-				"WHERE clin_rules.cqm_flag = 0 AND lst_opt.option_id NOT IN " .
+				"WHERE clin_rules.cqm_flag = 0 AND clin_rules.amc_flag = 0 AND lst_opt.option_id NOT IN " .
 					"( " .
 					"SELECT lst_opt.option_id " .
 					"FROM `clinical_plans_rules` cpr " .
