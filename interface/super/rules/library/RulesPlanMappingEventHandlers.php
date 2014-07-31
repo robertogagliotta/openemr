@@ -102,6 +102,18 @@ switch ($action) {
 		deletePlan($plan_id, $plan_pid);
 		
 		break;
+
+        case "togglePlanStatus":
+                 $plan_id = $_GET["plan_id"];
+                 $active_inactive = $_GET["plan_status"];
+                 if ($active_inactive == 'deactivate') {
+                      $nm_flag = 0;
+                    } else {
+                      $nm_flag = 1;
+                    }
+                 togglePlanStatus($plan_id, $nm_flag);
+
+                 break;
 		
 	case "getPlanStatus":
 		$plan_id = $_GET["plan_id"];
@@ -261,9 +273,18 @@ function deletePlan($plan_id, $plan_pid) {
 	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
 }
 
-function togglePlanStatus($plan_id, $isActive) {
-	//TODO:
-	
+function togglePlanStatus($plan_id, $nm_flag) {
+	$pid_val = 0;
+	$sql_st = "UPDATE clinical_plans SET " .
+                     "normal_flag = ? ".
+                     "WHERE id = ? AND pid = ? ";
+        sqlStatement($sql_st, array($nm_flag, $plan_id, $pid_val));
+        $togglePlanError = getSqlLastError();
+        if (!togglePlanError === NULL) {
+           trigger_error("sqlStatement fail !!", 512); }
+        else {
+             // tell user plan has being updated
+        }
 }
 
 function submitChanges($plan_id, $added_rules, $removed_rules) {
