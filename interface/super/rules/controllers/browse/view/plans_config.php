@@ -27,7 +27,8 @@
 		
 	    $.post(
 	    	'<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'; ?>'
-	    ).success(function(resp) {
+	    )
+	    .done(function(resp) {
 	        var data = $.parseJSON(resp);
 
 	        $.each(data, function(idx, obj) {
@@ -83,13 +84,13 @@
 			    			"/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id="; ?>' + selected_plan
 			    			+ '&plan_pid=' + selected_plan_pid							
 				)
-				.success(function(resp) {
+				.done(function(resp) {
 					//alert('Plan Deleted!');
 					$("body").removeClass("loading");
 					location.reload();    
 			    })
-			    .error(function(error) {
-				    console.log(error);
+			    .fail(function (jqXHR, textStatus) {
+				    console.log(textStatus);
 					alert('Error while deleting the plan!');
 					$("body").removeClass("loading");
 			    });			    
@@ -154,7 +155,7 @@
 			$.post( 
 				'<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=commitChanges'; ?>', 
 				dataString)
-			.success(function(resp) {
+			.done(function(resp) {
 				var obj = $.parseJSON(resp);
 				if (obj.status_code == '000') {
 					//Success
@@ -195,8 +196,8 @@
 
 	            $("body").removeClass("loading");
 			})
-			.error(function(e) {
-				console.log(e);
+			.fail(function (jqXHR, textStatus) {
+				console.log(textStatus);
 	            if (is_new_plan) {
 		           	alert('Error while adding new plan!');			           	
 		        } else {
@@ -233,7 +234,7 @@
 			    	'<?php echo  _base_url() . 
 			    			'/library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id='; ?>' + selected_plan								
 				)
-				.success(function(resp) {
+				.done(function(resp) {
 			        var data = $.parseJSON(resp);
 			        
 			        $('#cdr_rules')
@@ -269,7 +270,7 @@
 	    			'/library/RulesPlanMappingEventHandlers.php?action=getPlanStatus&plan_id='; ?>' + selected_plan
 	    			+ '&plan_pid=' + selected_plan_pid
 		)
-		.success(function(resp) {
+		.done(function(resp) {
 			var obj = $.parseJSON(resp);
 
 			if (obj.is_plan_active) {
@@ -279,8 +280,8 @@
 			}
 			 
 	    })
-	    .error(function(error) {
-		    console.log(error);
+	    .fail(function (jqXHR, textStatus) {
+		    console.log(textStatus);
 			alert('Error');
 	    });
 
@@ -307,11 +308,11 @@
 	    			'/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus&plan_id='; ?>' + selected_plan
 	    			+ '&plan_pid=' + selected_plan_pid + '&plan_status=' + action				
 		)
-		.success(function(resp) {
+		.done(function(resp) {
 			 
 	    })
-	    .error(function(error) {
-		    console.log(error);
+	    .fail(function (jqXHR, textStatus) {
+		    console.log(textStatus);
 			alert('Error');
 	    });
 	}
