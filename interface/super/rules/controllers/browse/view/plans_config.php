@@ -27,7 +27,7 @@
 		
 	    $.post(
 	    	'<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=getNonCQMPlans'; ?>'
-	    ).success(function(resp) {
+	    ).done(function(resp) {
 	        var data = $.parseJSON(resp);
 
 	        $.each(data, function(idx, obj) {
@@ -49,14 +49,12 @@
 		$("#cdr-status-deactivate").click(function() {
 			$deactivatePlan();
 			$togglePlanStatus(false);
-
 		});
 
 		//Activate Plan
 		$("#cdr-status-activate").click(function() {
 			$activatePlan();
 			$togglePlanStatus(true);
-
 		});
 
 		//Cancel
@@ -83,12 +81,12 @@
 			    			"/library/RulesPlanMappingEventHandlers.php?action=deletePlan&plan_id="; ?>' + selected_plan
 			    			+ '&plan_pid=' + selected_plan_pid							
 				)
-				.success(function(resp) {
+				.done(function(resp) {
 					//alert('Plan Deleted!');
 					$("body").removeClass("loading");
 					location.reload();    
 			    })
-			    .error(function(error) {
+			    .fail(function(jqXHR, textStatus) {
 				    console.log(error);
 					alert('Error while deleting the plan!');
 					$("body").removeClass("loading");
@@ -154,7 +152,7 @@
 			$.post( 
 				'<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=commitChanges'; ?>', 
 				dataString)
-			.success(function(resp) {
+			.done(function(resp) {
 				var obj = $.parseJSON(resp);
 				if (obj.status_code == '000') {
 					//Success
@@ -190,15 +188,15 @@
 			           	alert('Error while adding new plan!');			           	
 			        } else {
 			           	alert('Error while updating the plan!');
-			        }					
+			        }
 				}
 
 	            $("body").removeClass("loading");
 			})
-			.error(function(e) {
-				console.log(e);
+			.fail(function(jqXHR, textStatus) {
+				console.log(textStatus);
 	            if (is_new_plan) {
-		           	alert('Error while adding new plan!');			           	
+		           	alert('Error while adding new plan!');
 		        } else {
 		           	alert('Error while updating the plan!');
 		        }
@@ -233,13 +231,13 @@
 			    	'<?php echo  _base_url() . 
 			    			'/library/RulesPlanMappingEventHandlers.php?action=getRulesInAndNotInPlan&plan_id='; ?>' + selected_plan								
 				)
-				.success(function(resp) {
+				.done(function(resp) {
 			        var data = $.parseJSON(resp);
 			        
 			        $('#cdr_rules')
 			        	.append('<select id="cdr_rules_select" class="multiselect" multiple="multiple" name="cdr_rules_select[]"/>');
 			        
-			        $.each(data, function(idx, obj) {  		
+			        $.each(data, function(idx, obj) {
 						if (obj.selected  == "true") {
 							$("#cdr_rules_select")
 								.append(
@@ -250,7 +248,7 @@
 								.append(
 									$('<option value="' + obj.rule_id + '" init_value="not-selected">' + obj.rule_title + '</option>')
 								);
-						}								
+						}
 					});
 	
 			        $("#cdr_rules_select").multiselect({dividerLocation: 0.45});
@@ -259,7 +257,7 @@
 		} else {
 			$("#cdr_hide_show-div").hide();
 			$("#delete_plan").hide();
-		}		
+		}
 	}
 
 	$loadPlanStatus = function(selected_plan, selected_plan_pid) {
@@ -269,7 +267,7 @@
 	    			'/library/RulesPlanMappingEventHandlers.php?action=getPlanStatus&plan_id='; ?>' + selected_plan
 	    			+ '&plan_pid=' + selected_plan_pid
 		)
-		.success(function(resp) {
+		.done(function(resp) {
 			var obj = $.parseJSON(resp);
 
 			if (obj.is_plan_active) {
@@ -279,8 +277,8 @@
 			}
 			 
 	    })
-	    .error(function(error) {
-		    console.log(error);
+	    .fail(function(jqXHR, textStatus) {
+		    console.log(textStatus);
 			alert('Error');
 	    });
 
@@ -300,18 +298,30 @@
 		if (!isActive) {
 			action = 'deactivate';
 		} 
-		
-		$.post
-    	(
-	    	'<?php echo  _base_url() . 
-	    			'/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus&plan_id='; ?>' + selected_plan
-	    			+ '&plan_pid=' + selected_plan_pid + '&plan_status=' + action				
-		)
-		.success(function(resp) {
-			 
+                 
+                var postToggle =
+                       {
+                          "selected_plan": selected_plan,
+                          "plan_pid":  selected_plan_pid,
+                          "plan_status": action
+                       }
+               var dataStringToggle = JSON.stringify(postToggle);
+
+		$.post(
+	  '<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus'; ?>'
+               , dataStringToggle).done(function(resp) {
+                        var obj = $.parseJSON(resp);
+                           if (obj == '007')
+                            {
+                              //Success
+                              alert('Plan Status Changed');
+                             }
+                           if (obj == '002') {
+                              alert('Plan Status Failed to Change');
+                             }
 	    })
-	    .error(function(error) {
-		    console.log(error);
+	    .fail(function(jqXHR, textStatus) {
+		    console.log(textStatus);
 			alert('Error');
 	    });
 	}
@@ -319,7 +329,9 @@
 	$activatePlan = function() {
 		$("#cdr-status-activate").attr("disabled", true);
 		$('#cdr-status-activate').text('Active');
-		
+                $('#cdr-status-activate').hide();                //roberto changed
+		$("#plan-status-label").text("Status Active");  // to have only one button
+                $("#cdr-status-deactivate").show();               //roberto
 		$("#cdr-status-deactivate").removeAttr("disabled");
 		$('#cdr-status-deactivate').text('Deactivate');
 
@@ -329,8 +341,10 @@
 
 	$deactivatePlan = function() {
 		$("#cdr-status-deactivate").attr("disabled", true);
+                $("#cdr-status-deactivate").hide();    //roberto
 		$('#cdr-status-deactivate').text('Inactive');
-
+                $("#plan-status-label").text("Status  Inactive");  //roberto
+                $('#cdr-status-activate').show();        //roberto
 		$("#cdr-status-activate").removeAttr("disabled");
 		$('#cdr-status-activate').text('Activate');
 
@@ -355,9 +369,10 @@
 		<div id="new_plan_container"></div>
 		<div id="cdr_hide_show-div" style="display: none;">
 			<div id="plan_status_div" class="plan-status_div">
-				<label class="plan-status-label">Status:</label>
+			<!--	<label class="plan-status-label">Status:</label> -->
+                                <label id='plan-status-label'>Status:</label> <!-- roberto -->
 				<button id='cdr-status-activate' disabled>Active</button>
-	      		<button id='cdr-status-deactivate'>Deactivate</button>
+   	      		        <button id='cdr-status-deactivate'>Deactivate</button>
 			</div>
 			<br/>
 			<div id="cdr_rules" class="cdr-rules-class"></div>   	
