@@ -21,6 +21,7 @@
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
 
 <script type="text/javascript">
+
 	$(document).ready(function() {	
 		//load plans	
 		$("#cdr-plans").load('<?php library_src('RulesPlanMappingEventHandlers.php') ?>');
@@ -45,16 +46,17 @@
 			);
 		});
 
-		//Deactivate Plan
-		$("#cdr-status-deactivate").click(function() {
-			$deactivatePlan();
-			$togglePlanStatus(false);
-		});
+		//Update Plan status
+		$("#cdr-status").click(function() {
+                        if (window.buttonStatus == "active")
+                            {
+                               $deactivatePlan();
+                               $togglePlanStatus(false);
+                             } else {
 
-		//Activate Plan
-		$("#cdr-status-activate").click(function() {
-			$activatePlan();
-			$togglePlanStatus(true);
+			        $activatePlan();
+			        $togglePlanStatus(true);
+                             }
 		});
 
 		//Cancel
@@ -327,27 +329,18 @@
 	}
 
 	$activatePlan = function() {
-		$("#cdr-status-activate").attr("disabled", true);
-		$('#cdr-status-activate').text('Active');
-                $('#cdr-status-activate').hide();                //roberto changed
-		$("#plan-status-label").text("Status Active");  // to have only one button
-                $("#cdr-status-deactivate").show();               //roberto
-		$("#cdr-status-deactivate").removeAttr("disabled");
-		$('#cdr-status-deactivate').text('Deactivate');
-
-
-		$("#cdr-button-submit").attr('disabled', false); 
+                $("#plan-status-label").text("Status Active");
+                window.buttonStatus = "active";
+                $("#cdr-status").removeAttr("disabled");
+                $("#cdr-status").text('Deactivate');
+		$("#cdr-button-submit").attr('disabled', true); 
 	}
 
 	$deactivatePlan = function() {
-		$("#cdr-status-deactivate").attr("disabled", true);
-                $("#cdr-status-deactivate").hide();    //roberto
-		$('#cdr-status-deactivate').text('Inactive');
-                $("#plan-status-label").text("Status  Inactive");  //roberto
-                $('#cdr-status-activate').show();        //roberto
-		$("#cdr-status-activate").removeAttr("disabled");
-		$('#cdr-status-activate').text('Activate');
-
+                $("#plan-status-label").text("Status Inactive");
+                window.buttonStatus = "inactive";
+                $("#cdr-status").removeAttr("disabled");
+                $("#cdr-status").text('Activate');
 		$("#cdr-button-submit").attr('disabled', true); 
 	}
 </script>
@@ -371,8 +364,9 @@
 			<div id="plan_status_div" class="plan-status_div">
 			<!--	<label class="plan-status-label">Status:</label> -->
                                 <label id='plan-status-label'>Status:</label> <!-- roberto -->
-				<button id='cdr-status-activate' disabled>Active</button>
-   	      		        <button id='cdr-status-deactivate'>Deactivate</button>
+			<!--	<button id='cdr-status-activate' disabled>Active</button> -->
+                                <button id='cdr-status' disable>Activate</button>
+   	      		 <!--   <button id='cdr-status-deactivate'>Deactivate</button> -->
 			</div>
 			<br/>
 			<div id="cdr_rules" class="cdr-rules-class"></div>   	
