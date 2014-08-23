@@ -21,6 +21,7 @@
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
 
 <script type="text/javascript">
+
 	$(document).ready(function() {	
 		//load plans	
 		$("#cdr-plans").load('<?php library_src('RulesPlanMappingEventHandlers.php') ?>');
@@ -319,15 +320,24 @@
 	}
 
 	$activatePlan = function() {
+<<<<<<< cdr-plans-admin_gui_v2
         $("#plan-status-label").text("Status: Active");
         window.buttonStatus = "active";
         $("#cdr-status").removeAttr("disabled");
         $("#cdr-status").text('Deactivate');
 
 		$("#cdr-rules_cont").removeClass("overlay");
+=======
+                $("#plan-status-label").text("Status Active");
+                window.buttonStatus = "active";
+                $("#cdr-status").removeAttr("disabled");
+                $("#cdr-status").text('Deactivate');
+		$("#cdr-button-submit").attr('disabled', true); 
+>>>>>>> d16c052 Modified UI to have only one button for the Plan Status
 	}
 
 	$deactivatePlan = function() {
+<<<<<<< cdr-plans-admin_gui_v2
         $("#plan-status-label").text("Status: Inactive");
         window.buttonStatus = "inactive";
         $("#cdr-status").removeAttr("disabled");
@@ -336,6 +346,14 @@
 		$("#cdr-rules_cont").addClass("overlay"); 
 	}	
 
+=======
+                $("#plan-status-label").text("Status Inactive");
+                window.buttonStatus = "inactive";
+                $("#cdr-status").removeAttr("disabled");
+                $("#cdr-status").text('Activate');
+		$("#cdr-button-submit").attr('disabled', true); 
+	}
+>>>>>>> d16c052 Modified UI to have only one button for the Plan Status
 </script>
 
 <div class="cdr-mappings">
@@ -355,9 +373,18 @@
 		<div id="new_plan_container"></div>
 		<div id="cdr_hide_show-div" style="display: none;">
 			<div id="plan_status_div" class="plan-status_div">
+<<<<<<< cdr-plans-admin_gui_v2
 				<label id='plan-status-label'>Status:</label> <!-- roberto -->
 				<button id='cdr-status' disable>Activate</button>
  			</div>
+=======
+			<!--	<label class="plan-status-label">Status:</label> -->
+                                <label id='plan-status-label'>Status:</label> <!-- roberto -->
+			<!--	<button id='cdr-status-activate' disabled>Active</button> -->
+                                <button id='cdr-status' disable>Activate</button>
+   	      		 <!--   <button id='cdr-status-deactivate'>Deactivate</button> -->
+			</div>
+>>>>>>> d16c052 Modified UI to have only one button for the Plan Status
 			<br/>
 			
 			<div id="cdr-rules_cont">

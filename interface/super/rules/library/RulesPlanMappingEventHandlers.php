@@ -1,5 +1,4 @@
 <?php
-
 require_once( dirname(__FILE__) . "/../../../globals.php" );
 require_once( $GLOBALS['srcdir'] . "/log.inc");
 require_once( $GLOBALS['srcdir'] . "/sql.inc");
@@ -103,18 +102,32 @@ switch ($action) {
 		
 		break;
 
-        case "togglePlanStatus":
-                 $plan_id = $_GET["plan_id"];
-                 $active_inactive = $_GET["plan_status"];
-                 if ($active_inactive == 'deactivate') {
-                      $nm_flag = 0;
-                    } else {
-                      $nm_flag = 1;
-                    }
-                 togglePlanStatus($plan_id, $nm_flag);
+       case "togglePlanStatus":
+                $dataToggle  = json_decode(file_get_contents('php://input'), true);
 
-                 break;
-		
+                $plan_id_toggle = $dataToggle['selected_plan'];
+                $plan_pid_toggle = $dataToggle['selected_plan_pid'];
+                $active_inactive = $dataToggle['plan_status'];
+                if ($active_inactive == 'deactivate') {
+                     $nm_flag = 0;
+                   } else {
+                     $nm_flag = 1;
+                   }
+                try {
+                       togglePlanStatus($plan_id_toggle, $nm_flag);
+                } catch (Exception $e) {
+                     if ($e->getMessage() == "007")
+                       {
+                        $code_back = "007";
+                        echo json_encode($code_back);
+                       }
+                     if  ($e->getMessage() == "002") {
+                         $code_back = "002";
+                         echo json_encode($code_back);
+                  }
+	       	}
+               break;
+           
 	case "getPlanStatus":
 		$plan_id = $_GET["plan_id"];
 		$plan_pid = $_GET["plan_pid"];
@@ -251,14 +264,6 @@ function addNewPlan($plan_name, $plan_rules) {
 	//Add rules to plan
 	addRulesToPlan($plan_id, $plan_rules);
 	
-	/*
-	sleep(3);
-	$myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
-	$txt = $plan_id;
-	fwrite($myfile, $txt);
-	fclose($myfile);
-	*/
-	
 	return $plan_id;
 }
 
@@ -274,17 +279,32 @@ function deletePlan($plan_id, $plan_pid) {
 }
 
 function togglePlanStatus($plan_id, $nm_flag) {
-	$pid_val = 0;
-	$sql_st = "UPDATE clinical_plans SET " .
-                     "normal_flag = ? ".
-                     "WHERE id = ? AND pid = ? ";
-        sqlStatement($sql_st, array($nm_flag, $plan_id, $pid_val));
-        $togglePlanError = getSqlLastError();
-        if (!togglePlanError === NULL) {
-           trigger_error("sqlStatement fail !!", 512); }
-        else {
-             // tell user plan has being updated
-        }
+         $pid_val = 0;
+         $sql_st = "UPDATE clinical_plans SET " .
+                   "normal_flag = ? ".
+                   "WHERE id = ? AND pid = ? ";
+         sqlStatement($sql_st, array($nm_flag, $plan_id, $pid_val));
+         if ($nm_flag = 0)
+           {
+             $nm_chk = 1;
+           } 
+         if ($nm_flag = 1)
+           {
+             $nm_chk = 0;
+           }
+           $sql_check = "SELECT `id` " .
+                              "FROM `clinical_plans` " .
+                              "WHERE ((`id` = ?) AND (`pid` = ?) AND (`normal_flag` = ?));";
+         $res_chk = sqlStatement($sql_check, array($plan_id, $pid_val, $nm_chk));
+         $row_chk = sqlFetchArray($res_chk);
+          if ($row_chk == $plan_id)
+            {
+              throw new Exception("002");
+            }
+          else
+            {
+               throw new Exception("007");
+            }
 }
 
 function submitChanges($plan_id, $added_rules, $removed_rules) {
@@ -318,9 +338,7 @@ function removeRulesFromPlan($plan_id, $list_of_rules) {
 	}
 }
 
-function generatePlanID() {
-	//$plan_id = strtolower(preg_replace('/\s+/', '_', $plan_name)) . '_plan';
-	
+function generatePlanID() {	
 	$plan_id = 1;
 	$sql_st = "SELECT MAX(SUBSTR(clin_plans.id, 1, LOCATE('_plan', clin_plans.id)-1)) as max_planid " .
 			"FROM `clinical_plans` clin_plans " .
