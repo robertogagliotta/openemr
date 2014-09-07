@@ -302,17 +302,29 @@
 		if (!isActive) {
 			action = 'deactivate';
 		} 
-		
-		$.post
-    	(
-	    	'<?php echo  _base_url() . 
-	    			'/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus&plan_id='; ?>' + selected_plan
-	    			+ '&plan_pid=' + selected_plan_pid + '&plan_status=' + action				
-		)
-		.done(function(resp) {
-			 
+                 
+                var postToggle =
+                       {
+                          "selected_plan": selected_plan,
+                          "plan_pid":  selected_plan_pid,
+                          "plan_status": action
+                       }
+               var dataStringToggle = JSON.stringify(postToggle);
+
+		$.post(
+	  '<?php echo  _base_url() . '/library/RulesPlanMappingEventHandlers.php?action=togglePlanStatus'; ?>'
+               , dataStringToggle).done(function(resp) {
+                        var obj = $.parseJSON(resp);
+                           if (obj == '007')
+                            {
+                              //Success
+                              alert('Plan Status Changed');
+                             }
+                           if (obj == '002') {
+                              alert('Plan Status Failed to Change');
+                             }
 	    })
-	    .fail(function (jqXHR, textStatus) {
+	    .fail(function(jqXHR, textStatus) {
 		    console.log(textStatus);
 			alert('Error');
 	    });
