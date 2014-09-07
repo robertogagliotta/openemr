@@ -1,10 +1,12 @@
 <?php
-// Copyright (C) 2010-2011 Aron Racho <aron@mi-squred.com>
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+/**
+ * Copyright (C) 2010-2011 Aron Racho <aron@mi-squred.com, Jan Jajalla <jajalla23@gmail.com>
+ * This program does the UI for CDR Admin
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+*/
 ?>
 
 <link type="text/css" rel="stylesheet" href="<?php echo $GLOBALS['webroot'] . '/library/css/jquery-ui-1.8.21.custom.css'?>" />
@@ -17,6 +19,7 @@
 <script language="javascript" src="<?php js_src('/cdr-multiselect/plugins/localisation/jquery.localisation-min.js') ?>"></script>
 <script language="javascript" src="<?php js_src('/cdr-multiselect/plugins/scrollTo/jquery.scrollTo-min.js') ?>"></script>
 <script language="javascript" src="<?php js_src('/cdr-multiselect/ui.multiselect.js') ?>"></script>
+<script language="javascript" src="<?php js_src('/cdr-multiselect/locale/ui-multiselect-cdr.js') ?>"></script>
 <script language="javascript" src="<?php js_src('list.js') ?>"></script>
 <script language="javascript" src="<?php js_src('jQuery.fn.sortElements.js') ?>"></script>
 
@@ -61,7 +64,7 @@
 
 		//Cancel
 		$("#cdr-button-cancel").click(function() {
-			if (confirm('Are you sure you want to cancel your changes?')) {
+			if (confirm('<?php echo xls('Are you sure you want to cancel your changes?'); ?>')) {
 				$loadRules(
 					$('#cdr-plans-select').find('option:selected').attr('id'),
 					$('#cdr-plans-select').find('option:selected').attr('p_id')
@@ -71,7 +74,7 @@
 
 		//Delete Plan
 		$("#delete_plan").click(function() {
-			if (confirm('Are you sure you want to delete this plan?')) {
+			if (confirm('<?php echo xls('Are you sure you want to delete this plan?'); ?>')) {
 				var selected_plan = $('#cdr-plans-select').find('option:selected').attr('id');
 				var selected_plan_pid = $('#cdr-plans-select').find('option:selected').attr('p_id');
 
@@ -84,7 +87,6 @@
 			    			+ '&plan_pid=' + selected_plan_pid							
 				)
 				.done(function(resp) {
-					//alert('Plan Deleted!');
 					$("body").removeClass("loading");
 					location.reload();    
 			    })
@@ -128,10 +130,10 @@
 
 			//Validate
 			if (new_selected.length == 0 && new_unselected.length == 0) {
-				alert('No Changes Detected');
+				alert('<?php echo xls('No Changes Detected'); ?>');
 				return;
 			} else if (is_new_plan && plan_name.length == 0) {
-				alert('Plan Name Missing');
+				alert('<?php echo xls('Plan Name Missing'); ?>');
 				$('#new_plan_name')
 					.css({'border-color':'red',
 							'border-width':'3px'
@@ -165,19 +167,19 @@
 		        			.attr("selected","selected");
 	        			plan_id = obj.plan_id;
 
-			           	alert('Plan Added Successfully!');
+			           	alert('<?php echo xls('Plan Added Successfully!'); ?>');
 	        		
 			        } else {
-			           	alert('Plan Updated Successfully!');
+			           	alert('<?php echo xls('Plan Updated Successfully!'); ?>');
 			        }
 
 		            $loadRules(plan_id, 0);
 		            
 				} else if (obj.status_code == '001') {
-					alert('Unknown Error');
+					alert('<?php echo xls('Unknown Error'); ?>');
 
 				} else if (obj.status_code == '002') {
-					alert('Plan Name Already Taken!');
+					alert('<?php echo xls('Plan Name Already Taken!'); ?>');
 					$('#new_plan_name')
 						.css({'border-color':'red',
 							'border-width':'3px'
@@ -187,10 +189,10 @@
 					//Error
 					console.log(obj.status_message);
 		            if (is_new_plan) {
-			           	alert('Error while adding new plan!');			           	
+			           	alert('<?php echo xls('Error while adding new plan!'); ?>');
 			        } else {
-			           	alert('Error while updating the plan!');
-			        }					
+			           	alert('<?php echo xls('Error while updating the plan!'); ?>');
+			        }
 				}
 
 	            $("body").removeClass("loading");
@@ -198,9 +200,9 @@
 			.fail(function (jqXHR, textStatus) {
 				console.log(textStatus);
 	            if (is_new_plan) {
-		           	alert('Error while adding new plan!');			           	
+		           	alert('<?php echo xls('Error while adding new plan!'); ?>');
 		        } else {
-		           	alert('Error while updating the plan!');
+		           	alert('<?php echo xls('Error while updating the plan!'); ?>');
 		        }
 
 	            $("body").removeClass("loading");	
@@ -281,14 +283,14 @@
 	    })
 	    .fail(function (jqXHR, textStatus) {
 		    console.log(textStatus);
-			alert('Error');
+			alert('<?php echo xls('Error'); ?>');
 	    });
 
 	}
 
 	$newPlan = function() {
 		$('#new_plan_container')
-			.append('<label>Plan Name: </label>')
+                        .append('<?php echo xl('<label>Plan Name: </label>'); ?>')
 			.append('<input id="new_plan_name" type="text" name="new_plan_name">');
 
 		$("#cdr-rules_cont").removeClass("overlay");
@@ -317,33 +319,32 @@
                         var obj = $.parseJSON(resp);
                            if (obj == '007')
                             {
-                              //Success
-                              alert('Plan Status Changed');
+                              alert('<?php echo xls('Plan Status Changed'); ?>');
                              }
                            if (obj == '002') {
-                              alert('Plan Status Failed to Change');
+                              alert('<?php echo xls('Plan Status Failed to Change'); ?>');
                              }
 	    })
 	    .fail(function(jqXHR, textStatus) {
 		    console.log(textStatus);
-			alert('Error');
+			alert('<?php echo xls('Error'); ?>');
 	    });
 	}
 
 	$activatePlan = function() {
-        $("#plan-status-label").text("Status: Active");
+        $("#plan-status-label").text('<?php echo xl("Status: Active"); ?>');
         window.buttonStatus = "active";
         $("#cdr-status").removeAttr("disabled");
-        $("#cdr-status").text('Deactivate');
+        $("#cdr-status").text('<?php echo xl('Deactivate'); ?>');
 
 		$("#cdr-rules_cont").removeClass("overlay");
 	}
 
 	$deactivatePlan = function() {
-        $("#plan-status-label").text("Status: Inactive");
+        $("#plan-status-label").text('<?php echo xl("Status: Inactive"); ?>');
         window.buttonStatus = "inactive";
         $("#cdr-status").removeAttr("disabled");
-        $("#cdr-status").text('Activate');
+        $("#cdr-status").text('<?php echo xl('Activate'); ?>');
 
 		$("#cdr-rules_cont").addClass("overlay"); 
 	}	
@@ -352,22 +353,22 @@
 
 <div class="cdr-mappings">
 	<br/>
-	<div><b>View Plan Rules</b></div>
+	<div><b><?php echo out( xl( 'View Plan Rules' )); ?></b></div>
 	<br/>
 	<div id="cdr_mappings_form-div" class="cdr-form">
 		<div class="cdr-plans">
 			Plan:
 			<select id="cdr-plans-select" name="cdr-plans-select" class="cdr-plans-select-class">
-				<option id="select_plan" value="select_plan">- SELECT PLAN -</option>
+                             <option id="select_plan" value="select_plan">- <?php echo out( xl( 'SELECT PLAN' )); ?> -</option>
 				<option id="divider" value="divider" disabled/>
-				<option id="add_new_plan" value="add_new_plan">ADD NEW PLAN</option>
+				<option id="add_new_plan" value="add_new_plan"><?php echo out( xl( 'ADD NEW PLAN' )); ?></option>
 			</select>
 			<input title="Delete Plan" id="delete_plan" class="delete_button" type="image" style="display: none;"/>
 		</div>	
 		<div id="new_plan_container"></div>
 		<div id="cdr_hide_show-div" style="display: none;">
 			<div id="plan_status_div" class="plan-status_div">
-				<label id='plan-status-label'>Status:</label> <!-- roberto -->
+                                <label id='plan-status-label'><?php echo out( xl( 'Status' )); ?>:</label>
 				<button id='cdr-status' disable>Activate</button>
  			</div>
 			<br/>
@@ -376,8 +377,8 @@
 				<div id="cdr_rules" class="cdr-rules-class"></div>   	
 	      	
 		      	<div id="cdr_buttons_div" class="cdr-buttons-class">
-		      		<button id='cdr-button-cancel'>Cancel</button>
-		      		<button id='cdr-button-submit'>Submit</button>
+		      		<button id='cdr-button-cancel'><?php echo out( xl( 'Cancel' )); ?></button>
+		      		<button id='cdr-button-submit'><?php echo out( xl( 'Submit' )); ?></button>
 		      	</div>
 		    </div>
       	</div>
