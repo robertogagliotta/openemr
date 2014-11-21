@@ -1,11 +1,11 @@
 <?php
 /**
- * library/RulesPlanMappingEventHandlers_ajax.php handles ajax events from admin-gui rules plan mappings.
+ * library/RulesPlanMappingEventHandlers.php database interaction for admin-gui rules plan mappings.
  *
- * Functions to allow handling of user actions
- * on rules-plan mapping in Admin UI.
+ * Functions to allow safe database modifications
+ * during changes to rules-plan mapping in Admin UI.
  *
- * Copyright (C) 2008-2012 Rod Roark <rod@sunsetsystems.com>
+ * Copyright (C) Brady Miller, Jan Jajalla, Roberto Vasquez 2014
  *
  * LICENSE: This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,14 +19,13 @@
  * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
  *
  * @package OpenEMR
- * @author  Rod Roark <rod@sunsetsystems.com>
  * @author  Brady Miller <brady@sparmy.com>
+ * @author  Jan Jajalla <jajalla23@gmail.com>
+ * @author  Roberto Vasquez <roberto.gagliotta@gmail.com>
  * @link    http://www.open-emr.org
  */
 
 require_once( dirname(__FILE__) . "/../../../globals.php" );
-require_once( $GLOBALS['srcdir'] . "/log.inc");
-require_once( $GLOBALS['srcdir'] . "/sql.inc");
 require_once( dirname(__FILE__) . "/RulesPlanMappingEventHandlers.php" );
 
 $action = $_GET["action"];
@@ -95,21 +94,23 @@ switch ($action) {
 			try {
 				$plan_id = addNewPlan($plan_name, $added_rules);
 			} catch (Exception $e) {
+				$status_mssg = $e->getMessage();
+				$status_code = '001';				
+				
 				if ($e->getMessage() == "002") {
 					//Plan Name Taken
-					$status = array('status_code'=>'002', 'status_message'=>'Plan Name Already Exists!', 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
-					echo json_encode($status);
+					$status_code = '002';
+					$status_mssg = out(xl( 'Plan Name Already Exists!' ));
 
 				} else if ($e->getMessage() == "003") {
 					//Already in list options
-					$status = array('status_code'=>'003', 'status_message'=>'Plan Already in list_options', 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
-					echo json_encode($status);
-						
-				} else {
-					$status = array('status_code'=>'001', 'status_message'=>$e->getMessage(), 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
-					echo json_encode($status);
-				}
-					
+					$status_code = '003';
+					$status_mssg = out(xl( 'Plan Already in list_options' ));
+				} 
+
+				$status = array('status_code'=>$status_code, 'status_message'=>$status_mssg, 'plan_id'=>$plan_id, 'plan_title'=>$plan_name);
+				echo json_encode($status);
+				
 				break;
 			}
 		} else if (strlen($plan_id) > 0) {

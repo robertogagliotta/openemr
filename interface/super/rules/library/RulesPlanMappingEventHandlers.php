@@ -5,7 +5,7 @@
  * Functions to allow safe database modifications
  * during changes to rules-plan mapping in Admin UI.
  *
- * Copyright (C) 2008-2012 Rod Roark <rod@sunsetsystems.com>
+ * Copyright (C) Brady Miller, Jan Jajalla, Roberto Vasquez 2014
  *
  * LICENSE: This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,9 @@
  * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
  *
  * @package OpenEMR
- * @author  Rod Roark <rod@sunsetsystems.com>
  * @author  Brady Miller <brady@sparmy.com>
+ * @author  Jan Jajalla <jajalla23@gmail.com>
+ * @author  Roberto Vasquez <roberto.gagliotta@gmail.com>
  * @link    http://www.open-emr.org
  */
 
@@ -145,23 +146,21 @@ function addNewPlan($plan_name, $plan_rules) {
 }
 
 function deletePlan($plan_id) {
-	$plan_pid = 0;
-	$sql_st = "DELETE FROM `clinical_plans` WHERE `clinical_plans`.`id` = ? AND `clinical_plans`.`pid` = ?;";
-	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
+	$sql_st = "DELETE FROM `clinical_plans` WHERE `clinical_plans`.`id` = ?;";
+	$res = sqlStatement($sql_st, array($plan_id));
 	
 	$sql_st = "DELETE FROM `list_options` WHERE `list_id` = 'clinical_plans' AND `option_id` = ?;";
 	$res = sqlStatement($sql_st, array($plan_id));
 	
 	$sql_st = "DELETE FROM `clinical_plans_rules` WHERE `plan_id` = ?;";
-	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
+	$res = sqlStatement($sql_st, array($plan_id));
 }
 
 function togglePlanStatus($plan_id, $nm_flag) {
-         $pid_val = 0;
          $sql_st = "UPDATE clinical_plans SET " .
                    "normal_flag = ? ".
-                   "WHERE id = ? AND pid = ? ";
-         sqlStatement($sql_st, array($nm_flag, $plan_id, $pid_val));
+                   "WHERE id = ? AND pid = 0 ";
+         sqlStatement($sql_st, array($nm_flag, $plan_id));
          if ($nm_flag = 0)
            {
              $nm_chk = 1;
@@ -172,8 +171,8 @@ function togglePlanStatus($plan_id, $nm_flag) {
            }
            $sql_check = "SELECT `id` " .
                               "FROM `clinical_plans` " .
-                              "WHERE ((`id` = ?) AND (`pid` = ?) AND (`normal_flag` = ?));";
-         $res_chk = sqlStatement($sql_check, array($plan_id, $pid_val, $nm_chk));
+                              "WHERE ((`id` = ?) AND (`pid` = 0) AND (`normal_flag` = ?));";
+         $res_chk = sqlStatement($sql_check, array($plan_id, $nm_chk));
          $row_chk = sqlFetchArray($res_chk);
           if ($row_chk == $plan_id)
             {
@@ -244,12 +243,11 @@ function generatePlanID() {
 }
 
 function isPlanActive($plan_id) {
-	$plan_pid = 0;
 	$sql_st = "SELECT `normal_flag` " . 
 				"FROM `clinical_plans` " . 
-				"WHERE `id` = ? AND `pid` = ?;";
+				"WHERE `id` = ? AND `pid` = 0;";
 
-	$res = sqlStatement($sql_st, array($plan_id, $plan_pid));
+	$res = sqlStatement($sql_st, array($plan_id));
 
 	$row = sqlFetchArray($res);
 	if ($row['normal_flag'] == 1) {
