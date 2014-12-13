@@ -1,11 +1,28 @@
 <?php
 /**
- * Copyright (C) 2010-2011 Aron Racho <aron@mi-squred.com, Jan Jajalla <jajalla23@gmail.com>
- * This program does the UI for CDR Admin
- * This program is free software; you can redistribute it and/or
+ * view/plans_config.php  UI for CDR admin rules plan
+ *
+ * UI to select or add new plans in plans configuration
+ *  
+ * Copyright (C) 2008-2012 Rod Roark <rod@sunsetsystems.com>
+ * Copyright (C) Brady Miller, Jan Jajalla, Roberto Vasquez 2014
+ *
+ * LICENSE: This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
+ * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
+ * This program is didtributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
+ *
+ * @package OpenEMR
+ * @author Brady Miller <brady@sparmy.com>
+ * @author Jan Jajalla <Jajalla23@gmail.com>
+ * @author Roberto Vaquez <robertogagliotta@gmail.com>
+ * @link http://www.open-emr.org
 */
 ?>
 
@@ -92,7 +109,7 @@
 			    })
 			    .fail(function (jqXHR, textStatus) {
 				    console.log(textStatus);
-					alert('Error while deleting the plan!');
+                                        alert('<?php echo xls('Error while deleting the plan'); ?>');
 					$("body").removeClass("loading");
 			    });			    
 	        }
@@ -167,10 +184,10 @@
 		        			.attr("selected","selected");
 	        			plan_id = obj.plan_id;
 
-			           	alert('<?php echo xls('Plan Added Successfully!'); ?>');
+			           	alert('<?php echo xls('Plan Added Successfully'); ?>');
 	        		
 			        } else {
-			           	alert('<?php echo xls('Plan Updated Successfully!'); ?>');
+			           	alert('<?php echo xls('Plan Updated Successfully'); ?>');
 			        }
 
 		            $loadRules(plan_id, 0);
@@ -179,7 +196,7 @@
 					alert('<?php echo xls('Unknown Error'); ?>');
 
 				} else if (obj.status_code == '002') {
-					alert('<?php echo xls('Plan Name Already Taken!'); ?>');
+					alert('<?php echo xls('Plan Name Already Taken'); ?>');
 					$('#new_plan_name')
 						.css({'border-color':'red',
 							'border-width':'3px'
@@ -189,9 +206,9 @@
 					//Error
 					console.log(obj.status_message);
 		            if (is_new_plan) {
-			           	alert('<?php echo xls('Error while adding new plan!'); ?>');
+			           	alert('<?php echo xls('Error while adding new plan'); ?>');
 			        } else {
-			           	alert('<?php echo xls('Error while updating the plan!'); ?>');
+			           	alert('<?php echo xls('Error while updating the plan'); ?>');
 			        }
 				}
 
@@ -200,9 +217,9 @@
 			.fail(function (jqXHR, textStatus) {
 				console.log(textStatus);
 	            if (is_new_plan) {
-		           	alert('<?php echo xls('Error while adding new plan!'); ?>');
+		           	alert('<?php echo xls('Error while adding new plan'); ?>');
 		        } else {
-		           	alert('<?php echo xls('Error while updating the plan!'); ?>');
+		           	alert('<?php echo xls('Error while updating the plan'); ?>');
 		        }
 
 	            $("body").removeClass("loading");	
@@ -290,7 +307,7 @@
 
 	$newPlan = function() {
 		$('#new_plan_container')
-                        .append('<?php echo xl('<label>Plan Name: </label>'); ?>')
+                        .append('<?php echo '<label>' . out(xl('Plan Name')) . ': </label>'); ?>')
 			.append('<input id="new_plan_name" type="text" name="new_plan_name">');
 
 		$("#cdr-rules_cont").removeClass("overlay");
@@ -332,19 +349,19 @@
 	}
 
 	$activatePlan = function() {
-        $("#plan-status-label").text('<?php echo xl("Status: Active"); ?>');
+        $("#plan-status-label").text('<?php echo out(xl(('Status')) . ': ' . out(xl('Active')); ?>');
         window.buttonStatus = "active";
         $("#cdr-status").removeAttr("disabled");
-        $("#cdr-status").text('<?php echo xl('Deactivate'); ?>');
+        $("#cdr-status").text('<?php echo out(xl('Deactivate')); ?>');
 
 		$("#cdr-rules_cont").removeClass("overlay");
 	}
 
 	$deactivatePlan = function() {
-        $("#plan-status-label").text('<?php echo xl("Status: Inactive"); ?>');
+        $("#plan-status-label").text('<?php echo out(xl(('Status')) . ': ' . out(xl('Inactive')); ?>');
         window.buttonStatus = "inactive";
         $("#cdr-status").removeAttr("disabled");
-        $("#cdr-status").text('<?php echo xl('Activate'); ?>');
+        $("#cdr-status").text('<?php echo out(xl('Activate')); ?>');
 
 		$("#cdr-rules_cont").addClass("overlay"); 
 	}	
@@ -357,19 +374,19 @@
 	<br/>
 	<div id="cdr_mappings_form-div" class="cdr-form">
 		<div class="cdr-plans">
-			Plan:
+			<?php echo out(xl('Plan')) . ':'; ?>
 			<select id="cdr-plans-select" name="cdr-plans-select" class="cdr-plans-select-class">
                              <option id="select_plan" value="select_plan">- <?php echo out( xl( 'SELECT PLAN' )); ?> -</option>
 				<option id="divider" value="divider" disabled/>
 				<option id="add_new_plan" value="add_new_plan"><?php echo out( xl( 'ADD NEW PLAN' )); ?></option>
 			</select>
-			<input title="Delete Plan" id="delete_plan" class="delete_button" type="image" style="display: none;"/>
+			<input title=<?php echo out(xl('Delete Plan')); ?> id="delete_plan" class="delete_button" type="image" style="display: none;"/>
 		</div>	
 		<div id="new_plan_container"></div>
 		<div id="cdr_hide_show-div" style="display: none;">
 			<div id="plan_status_div" class="plan-status_div">
-                                <label id='plan-status-label'><?php echo out( xl( 'Status' )); ?>:</label>
-				<button id='cdr-status' disable>Activate</button>
+                                <label id='plan-status-label'><?php echo out( xl( 'Status' )) . ':'; ?></label>
+				<button id='cdr-status' disable><?php echo out( xl( 'Activate' )); ?></button>
  			</div>
 			<br/>
 			
