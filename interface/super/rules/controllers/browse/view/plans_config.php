@@ -307,7 +307,7 @@
 
 	$newPlan = function() {
 		$('#new_plan_container')
-                        .append('<?php echo '<label>' . out(xl('Plan Name')) . ': </label>'); ?>')
+                        .append('<?php echo '<label>' . out(xl('Plan Name')) . ': </label>'; ?>')
 			.append('<input id="new_plan_name" type="text" name="new_plan_name">');
 
 		$("#cdr-rules_cont").removeClass("overlay");
@@ -349,7 +349,7 @@
 	}
 
 	$activatePlan = function() {
-        $("#plan-status-label").text('<?php echo out(xl(('Status')) . ': ' . out(xl('Active')); ?>');
+        $("#plan-status-label").text('<?php echo out(xl('Status')) . ': ' . out(xl('Active')); ?>');
         window.buttonStatus = "active";
         $("#cdr-status").removeAttr("disabled");
         $("#cdr-status").text('<?php echo out(xl('Deactivate')); ?>');
@@ -358,7 +358,7 @@
 	}
 
 	$deactivatePlan = function() {
-        $("#plan-status-label").text('<?php echo out(xl(('Status')) . ': ' . out(xl('Inactive')); ?>');
+        $("#plan-status-label").text('<?php echo out(xl('Status')) . ': ' . out(xl('Inactive')); ?>');
         window.buttonStatus = "inactive";
         $("#cdr-status").removeAttr("disabled");
         $("#cdr-status").text('<?php echo out(xl('Activate')); ?>');
