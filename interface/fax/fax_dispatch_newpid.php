@@ -19,7 +19,7 @@ require_once("$srcdir/sql.inc");
 
 $res = sqlStatement("SELECT date, encounter, reason FROM form_encounter " .
   "WHERE pid = ? " .
-  "ORDER BY date DESC, encounter DESC LIMIT 10", array($_GET['p']);
+  "ORDER BY date DESC, encounter DESC LIMIT 10", array($_GET['p']));
 
 echo "var s = document.forms[0].form_copy_sn_visit;\n";
 echo "s.options.length = 0;\n";
