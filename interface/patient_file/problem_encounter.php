@@ -1,12 +1,29 @@
 <?php
 /**
- * Copyright (C) 2005 Rod Roark <rod@sunsetsystems.com>
+ * Copyright (C) 2008-2012 Rod Roark <rod@sunsetsystems.com>
  *
- * This program is free software; you can redistribute it and/or
+ * This script add and delete Issues and Encounters relationships. 
+ *
+ * LICENSE: This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
+ *
+ * @package OpenEMR
+ * @author  Rod Roark <rod@sunsetsystems.com>
+ * @author  Brady Miller <brady@sparmy.com>
+ * @author  Kevin Yeh <kevin.y@integralemr.com>
+ * @link    http://www.open-emr.org
  */
+
+ $fake_register_globals=false;
+ $sanitize_all_escapes=true;
 
  include_once("../globals.php");
  include_once("$srcdir/patient.inc");
@@ -42,21 +59,19 @@
   preg_match_all($pattern, $form_pelist, $matches);
   $numsets = count($matches[1]);
 
-  sqlQuery("DELETE FROM issue_encounter WHERE pid = '$form_pid'");
-
+  $query = "DELETE FROM issue_encounter WHERE pid = ?";
+  sqlQuery($query, array($form_pid));
   for ($i = 0; $i < $numsets; ++$i) {
    $list_id   = $matches[1][$i];
    $encounter = $matches[2][$i];
-   // $resolved = ($matches[3][$i] == 'Y') ? 1 : 0;
    $query = "INSERT INTO issue_encounter ( " .
-    "pid, list_id, encounter" . // , resolved " .
+    "pid, list_id, encounter" .
     ") VALUES ( " .
-    "$form_pid, $list_id, $encounter" . // , $resolved " .
+    " ?, ?, ?" .
     ")";
-   sqlQuery($query);
+   sqlQuery($query, array($form_pid, $list_id, $encounter)); 
   }
 
-  // All done.
   echo "<html><body><script language='JavaScript'>\n";
   if ($alertmsg) echo " alert('$alertmsg');\n";
   echo " window.close();\n";
