@@ -43,8 +43,6 @@ $returnurl = $GLOBALS['concurrent_layout'] ? 'encounter_top.php' : 'patient_enco
 
 if ($_POST['confirm']) {
     // set the deleted flag of the indicated form
-//    $sql = "update forms set deleted=1 where id=".$_POST['id'];
-//    if ($_POST['id'] != "*" && $_POST['id'] != '') sqlInsert($sql);
     $sql = "update forms set deleted=1 where id= ?";
     if ($_POST['id'] != "*" && $_POST['id'] != '') sqlInsert($sql, array($_POST['id']));
     // log the event   
