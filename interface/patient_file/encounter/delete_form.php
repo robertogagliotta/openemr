@@ -1,8 +1,8 @@
 <?php
 /**
- * Copyright (C) 2008-2012 Rod Roark <rod@sunsetsystems.com>
- *
- * This script add and delete Issues and Encounters relationships. 
+ * Copyright (C) 2005 Rod Roark <rod@sunsetsystems.com>
+ * Copyright (C) 2015 Roberto Vasquez <robertogagliotta@gmail.com>
+ * This script delete an Encounter form. 
  *
  * LICENSE: This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,12 +17,9 @@
  *
  * @package OpenEMR
  * @author  Rod Roark <rod@sunsetsystems.com>
- * @author  Brady Miller <brady@sparmy.com>
- * @author  Kevin Yeh <kevin.y@integralemr.com>
+ * @author  Roberto Vasquez <robertogagliotta@gmail.com>
  * @link    http://www.open-emr.org
  */
-$fake_register_globals=false;
-$sanitize_all_escapes=true;
 
 include_once("../../globals.php");
 
