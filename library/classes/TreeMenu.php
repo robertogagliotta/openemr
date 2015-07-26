@@ -55,10 +55,12 @@
 * Thanks go to Chip Chapin (http://www.chipchapin.com) for many
 * excellent ideas and improvements.
 *
+* @package OpenEMR
+* @package HTML_TreeMenu
 * @author  Richard Heyes <richard@php.net>
 * @author  Harald Radi <harald.radi@nme.at>
 * @access  public
-* @package HTML_TreeMenu
+* @link    http://www.open-emr.org
 */
 
 class HTML_TreeMenu
@@ -678,7 +680,7 @@ class HTML_TreeMenu_DHTML extends HTML_TreeMenu_Presentation
                         $prefix,
                         str_replace("'", "\\'", $nodeObj->text),
                         !empty($nodeObj->icon) ? "'" . $nodeObj->icon . "'" : 'null',
-                        !empty($nodeObj->link) ? "'" . $nodeObj->link . "'" : 'null',
+                        !empty($nodeObj->link) ? "'" . attr($nodeObj->link) . "'" : 'null',
                         $expanded,
                         $isDynamic,
                         $nodeObj->cssClass,
