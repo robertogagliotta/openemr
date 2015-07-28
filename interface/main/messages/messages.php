@@ -206,7 +206,7 @@ if($task == "addnew" or $task == "edit") {
  // Display the Messages page layout.
 echo "
 <form name=new_note id=new_note action=\"messages.php?showall=".attr($showall)."&sortby=".attr($sortby)."&sortorder=".attr($sortorder)."&begin=".attr($begin)."&$activity_string_html\" method=post>
-<input type=hidden name=noteid id=noteid value=".attr($noteid).">
+<input type=hidden name=noteid id=noteid value='".attr($noteid)."'>
 <input type=hidden name=task id=task value=add>";
 ?>
 <div id="pnotes"><center>
