@@ -307,7 +307,7 @@ else
 {
     $pagestart=0;
 }
-$getStringForPage="&pagesize=".$pagesize."&pagestart=".$pagestart;
+$getStringForPage="&pagesize=".text($pagesize)."&pagestart=".text($pagestart);
 
 ?>
 <?php if ($billing_view) { ?>
