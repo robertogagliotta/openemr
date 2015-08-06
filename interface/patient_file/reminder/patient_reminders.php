@@ -229,17 +229,17 @@ else {
 <div id='report_results'>
     <table>
       <thead>
-        <th><?php echo htmlspecialchars( xl('Item'), ENT_NOQUOTES) . " " . $sortlink[0]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Patient'), ENT_NOQUOTES) . " " . $sortlink[1]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Due Status'), ENT_NOQUOTES) . " " . $sortlink[2]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Date Created'), ENT_NOQUOTES) . " " . $sortlink[3]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Email Auth'), ENT_NOQUOTES) . " " . $sortlink[4]; ?></th>
-        <th><?php echo htmlspecialchars( xl('SMS Auth'), ENT_NOQUOTES) . " " . $sortlink[5]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Date Sent'), ENT_NOQUOTES) . " " . $sortlink[6]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Voice Sent'), ENT_NOQUOTES) . " " . $sortlink[7]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Email Sent'), ENT_NOQUOTES) . " " . $sortlink[8]; ?></th>
-        <th><?php echo htmlspecialchars( xl('SMS Sent'), ENT_NOQUOTES) . " " . $sortlink[9]; ?></th>
-        <th><?php echo htmlspecialchars( xl('Mail Sent'), ENT_NOQUOTES) . " " . $sortlink[10]; ?></th>
+        <th><?php echo htmlspecialchars( xl('Item'), ENT_NOQUOTES) . " " . text($sortlink[0]); ?></th>
+        <th><?php echo htmlspecialchars( xl('Patient'), ENT_NOQUOTES) . " " . "text($sortlink[1])"; ?></th>
+        <th><?php echo htmlspecialchars( xl('Due Status'), ENT_NOQUOTES) . " " . '"text($sortlink[2])"'; ?></th>
+        <th><?php echo htmlspecialchars( xl('Date Created'), ENT_NOQUOTES) . " " . text($sortlink[3]); ?></th>
+        <th><?php echo htmlspecialchars( xl('Email Auth'), ENT_NOQUOTES) . " " . text($sortlink[4]); ?></th>
+        <th><?php echo htmlspecialchars( xl('SMS Auth'), ENT_NOQUOTES) . " " . text($sortlink[5]); ?></th>
+        <th><?php echo htmlspecialchars( xl('Date Sent'), ENT_NOQUOTES) . " " . text($sortlink[6]); ?></th>
+        <th><?php echo htmlspecialchars( xl('Voice Sent'), ENT_NOQUOTES) . " " . text($sortlink[7]); ?></th>
+        <th><?php echo htmlspecialchars( xl('Email Sent'), ENT_NOQUOTES) . " " . text($sortlink[8]); ?></th>
+        <th><?php echo htmlspecialchars( xl('SMS Sent'), ENT_NOQUOTES) . " " . text($sortlink[9]); ?></th>
+        <th><?php echo htmlspecialchars( xl('Mail Sent'), ENT_NOQUOTES) . " " . text($sortlink[10]); ?></th>
       </thead>
       <tbody>
 <?php
