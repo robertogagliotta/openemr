@@ -301,7 +301,7 @@ td,th {
     <td class='currentvalues'><input type="text" size='20'
       name="note" id='note' value="{$vitals->get_note()}" /></td>
   {foreach item=result from=$results}
-    <td class='historicalvalues'>{$result.note}</td>
+    <td class='historicalvalues'>{".attr($result.note)."}</td>
   {/foreach}</tr>
 
 	<tr>
