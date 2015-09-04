@@ -537,7 +537,7 @@ class C_Prescription extends Controller {
                 $patterns = array ('/\n/','/     /');
 	        $replace = array ('<br>','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
 	        $d = preg_replace($patterns, $replace, $d);
-                echo ("<div class='scriptdiv'>\n" . $d . "</div>\n");
+                echo ("<div class='scriptdiv'>\n" . "text($d)" . "</div>\n");
         }
 
 	function multiprintfax_action($id = "") {
