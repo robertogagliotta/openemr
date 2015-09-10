@@ -249,7 +249,7 @@ class Prescription extends ORDataObject {
     }
 
     function get_unit_display( $display_form="" ) {
-    	return( $this->unit_array[$this->unit] );
+    	return( $this->unit_array[text($this->unit)] );
     }
 
     function get_unit() {
@@ -279,28 +279,28 @@ class Prescription extends ORDataObject {
     	$this->dosage = $dosage;
     }
     function get_dosage() {
-        return $this->dosage;
+        return text($this->dosage);
     }
 
     function set_form($form) {
         if (is_numeric($form)) { $this->form = $form; }
     }
     function get_form() {
-        return $this->form;
+        return text($this->form);
     }
     
     function set_refills($refills) {
         if (is_numeric($refills)) { $this->refills = $refills; }
     }
     function get_refills() {
-        return $this->refills;
+        return text($this->refills);
     }
 
     function set_size($size) {
         if (is_numeric($size)) { $this->size = $size; }
     }
     function get_size() {
-        return $this->size;
+        return text($this->size);
     }
 
     function set_quantity($qty) {
@@ -309,7 +309,7 @@ class Prescription extends ORDataObject {
     // }
     }
     function get_quantity() {
-        return $this->quantity;
+        return text($this->quantity);
     }
     
     function set_route($route) {
@@ -330,7 +330,7 @@ class Prescription extends ORDataObject {
         if (is_numeric($sub)) { $this->substitute = $sub; }
     }
     function get_substitute() {
-        return $this->substitute;
+        return text($this->substitute);
     }
     function set_erx_source($erx_source) {
         $this->erx_source = $erx_source;
@@ -378,7 +378,7 @@ class Prescription extends ORDataObject {
         if (is_numeric($pr)) { $this->per_refill = $pr; }
     }
     function get_per_refill() {
-        return $this->per_refill;
+        return text($this->per_refill);
     }
 
     function set_patient_id($id) {
@@ -483,14 +483,14 @@ class Prescription extends ORDataObject {
         $this->note = $note;
     }
     function get_note() {
-        return $this->note;
+        return text($this->note);
     }
 
     function set_drug($drug) {
         $this->drug = $drug;
     }
     function get_drug() {
-        return $this->drug;
+        return text($this->drug);
     }
 
     function get_filled_by_id() {
