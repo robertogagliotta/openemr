@@ -1,8 +1,24 @@
 <?php
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+/**
+ * controllers/C_Prescription.class.php
+ *
+ * Copyright (C) 2015 Roberto Vasquez <robertogagliotta@gmail.com>
+ *
+ * LICENSE: This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
+ *
+ * @package OpenEMR
+ * @author  Roberto Vasquez <robertogagliotta@gmail.com>
+ * @link    http://www.open-emr.org
+ */
 
 require_once($GLOBALS['fileroot'] . "/library/classes/Controller.class.php");
 require_once($GLOBALS['fileroot'] . "/library/classes/Prescription.class.php");
@@ -475,24 +491,24 @@ class C_Prescription extends Controller {
         }
 
 	function get_prescription_body_text($p) {
-		$body = '<b>' . xl('Rx') . ': ' . $p->get_drug() . ' ' . $p->get_size() . ' ' . $p->get_unit_display();
-		if ($p->get_form()) $body .= ' [' . $p->form_array[$p->get_form()] . "]";
+		$body = '<b>' . xl('Rx') . ': ' . text($p->get_drug()) . ' ' . text($p->get_size()) . ' ' . text($p->get_unit_display());
+		if ($p->get_form()) $body .= ' [' . $p->form_array[text($p->get_form())] . "]";
 		$body .= "</b>     <i>" .
-			$p->substitute_array[$p->get_substitute()] . "</i>\n" .
-			'<b>' . xl('Disp #') . ':</b> <u>' . $p->get_quantity() . "</u>\n" .
-			'<b>' . xl('Sig') . ':</b> ' . $p->get_dosage() . ' ' . $p->form_array[$p->get_form()] . ' ' .
-			$p->route_array[$p->get_route()] . ' ' . $p->interval_array[$p->get_interval()] . "\n";
+			$p->substitute_array[text($p->get_substitute())] . "</i>\n" .
+			'<b>' . xl('Disp #') . ':</b> <u>' . text($p->get_quantity()) . "</u>\n" .
+			'<b>' . xl('Sig') . ':</b> ' . text($p->get_dosage()) . ' ' . $p->form_array[text($p->get_form())] . ' ' .
+			$p->route_array[text($p->get_route())] . ' ' . $p->interval_array[text($p->get_interval())] . "\n";
 		if ($p->get_refills() > 0) {
-			$body .= "\n<b>" . xl('Refills') . ":</b> <u>" .  $p->get_refills();
+			$body .= "\n<b>" . xl('Refills') . ":</b> <u>" .  text($p->get_refills());
 			if ($p->get_per_refill()) {
-				$body .= " " . xl('of quantity') . " " . $p->get_per_refill();
+				$body .= " " . xl('of quantity') . " " . text($p->get_per_refill());
 			}
 			$body .= "</u>\n";
 		}
 		else {
 			$body .= "\n<b>" . xl('Refills') . ":</b> <u>0 (" . xl('Zero') . ")</u>\n";
 		}
-		$note = $p->get_note();
+		$note = text($p->get_note());
 		if ($note != '') {
 			$body .= "\n$note\n";
 		}
