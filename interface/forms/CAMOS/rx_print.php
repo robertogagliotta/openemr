@@ -173,7 +173,7 @@ function bottomHeaderRx() {
   </div>
   <div class='content'>
     <?php
-        print $camos_content[0]; 
+        print text($camos_content[0]); 
     ?>
   </div>
   <?php print $sigline[$_GET[sigline]] ?>
