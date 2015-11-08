@@ -137,15 +137,13 @@ if ($INTEGRATED_AR) {
     $where = "";
     foreach ($_POST['form_cb'] as $key => $value) $where .= " OR f.id = $key";
     $where = substr($where, 4);
-
     $res = sqlStatement("SELECT " .
       "f.id, f.date, f.pid, f.encounter, f.stmt_count, f.last_stmt_date, " .
       "p.fname, p.mname, p.lname, p.street, p.city, p.state, p.postal_code " .
       "FROM form_encounter AS f, patient_data AS p " .
-      "WHERE ( $where ) AND " .
-      "p.pid = f.pid " .
-      "ORDER BY p.lname, p.fname, f.pid, f.date, f.encounter");
-
+      "WHERE ( ? ) AND " .
+      "p.pid = ? " .
+      "ORDER BY p.lname, p.fname, f.pid, f.date, f.encounter", array($where, f.pid));
     $stmt = array();
     $stmt_count = 0;
 
@@ -260,11 +258,12 @@ else {
 
     $where = "";
     foreach ($_POST['form_cb'] as $key => $value) $where .= " OR ar.id = $key";
-    $where = substr($where, 4);
 
+    $where = substr($where, 4);
     // Sort by patient so that multiple invoices can be
     // represented on a single statement.
     if ($got_address_table) {
+
       $res = SLQuery("SELECT ar.*, customer.name, " .
         "address.address1, address.address2, " .
         "address.city, address.state, address.zipcode, " .
@@ -274,6 +273,7 @@ else {
         "customer.id = ar.customer_id AND " .
         "address.trans_id = ar.customer_id " .
         "ORDER BY lname, fname, ar.customer_id, ar.transdate");
+
     }
     else {
       $res = SLQuery("SELECT ar.*, customer.name, " .
