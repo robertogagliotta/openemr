@@ -130,21 +130,27 @@ if ($INTEGRATED_AR) {
 
   // Print or download statements if requested.
   //
+  //
   if (($_POST['form_print'] || $_POST['form_download'] || $_POST['form_pdf']) && $_POST['form_cb']) {
 
     $fhprint = fopen($STMT_TEMP_FILE, 'w');
 
-    $where = "";
-    foreach ($_POST['form_cb'] as $key => $value) $where .= " OR f.id = $key";
-    $where = substr($where, 4);
+    sqlBindArray = array();
+    foreach ($_POST['form_cb'] as $key => $value) {
+        array_push($sqlBindArray, $key);
+     }
+    $value1 = $sqlBindArray[0];
+    $value2 = $sqlBindArray[1];
 
     $res = sqlStatement("SELECT " .
       "f.id, f.date, f.pid, f.encounter, f.stmt_count, f.last_stmt_date, " .
       "p.fname, p.mname, p.lname, p.street, p.city, p.state, p.postal_code " .
       "FROM form_encounter AS f, patient_data AS p " .
-      "WHERE ( $where ) AND " .
+      "WHERE ( f.id = ? OR f.id = ? ) AND " .
       "p.pid = f.pid " .
-      "ORDER BY p.lname, p.fname, f.pid, f.date, f.encounter");
+      "ORDER BY p.lname, p.fname, f.pid, f.date, f.encounter", array($value1, $value2));
+
+
 
     $stmt = array();
     $stmt_count = 0;
