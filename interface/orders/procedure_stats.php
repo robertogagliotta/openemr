@@ -1,13 +1,28 @@
 <?php
-// Copyright (C) 2010-2013 Rod Roark <rod@sunsetsystems.com>
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+/**
+ * This module creates statistical reports related tp lab tests and
+ * other procedure orders.
+ *
+ * Copyright (C) 2010-2013 Rod Roark <rod@sunsetsystems.com>
+ * Copyroght (C) 2015 Roberto Vasquez <robertogagliotta@gmail.com>
+ *
+ * LICENSE: This program is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU General Public License 
+ * as published by the Free Software Foundation; either version 2 
+ * of the License, or (at your option) any later version. 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+ * GNU General Public License for more details. 
+ * You should have received a copy of the GNU General Public License 
+ * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;. 
+ * 
+ * @package OpenEMR 
+ * @author  Rod Roark <rod@sunsetsystems.com> 
+ * @author Roberto Vasquez <robertogagliotta@gmail.com> 
+ * @link    http://www.open-emr.org 
+ */ 
 
-// This module creates statistical reports related to lab tests and
-// other procedure orders.
 
 require_once("../globals.php");
 require_once("../../library/patient.inc");
@@ -413,11 +428,11 @@ foreach (array(1 => 'Screen', 2 => 'Printer', 3 => 'Export File') as $key => $va
       "WHERE po.date_ordered IS NOT NULL AND po.date_ordered >= '$from_date' " .
       "AND po.date_ordered <= '$to_date' ";
     if ($form_facility) {
-      $query .= "AND fe.facility_id = '$form_facility' ";
+      $query .= "AND fe.facility_id = ? ";
     }
     $query .= "ORDER BY fe.pid, fe.encounter, ps.result_code"; // needed?
 
-    $res = sqlStatement($query);
+    $res = sqlStatement($query, $form_facility);
 
     while ($row = sqlFetchArray($res)) {
       process_result_code($row);
