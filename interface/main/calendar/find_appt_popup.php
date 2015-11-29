@@ -71,8 +71,12 @@
  $slotsecs = $GLOBALS['calendar_interval'] * 60;
 
  $catslots = 1;
+
+ $sqlBindArray = array();
+
+ array_push($sqlBindArray, $input_catid);
  if ($input_catid) {
-  $srow = sqlQuery("SELECT pc_duration FROM openemr_postcalendar_categories WHERE pc_catid = '$input_catid'");
+  $srow = sqlQuery("SELECT pc_duration FROM openemr_postcalendar_categories WHERE pc_catid = ?", $sqlBindArray);
   if ($srow['pc_duration']) $catslots = ceil($srow['pc_duration'] / $slotsecs);
  }
 
@@ -125,22 +129,26 @@
   // So, values may range from 0 to 7.
   //
   $slots = array_pad(array(), $slotcount, 0);
+  
+  $sqlBindArray = array();
+  array_push($sqlBindArray, $providerid);
 
   // Note there is no need to sort the query results.
   $query = "SELECT pc_eventDate, pc_endDate, pc_startTime, pc_duration, " .
    "pc_recurrtype, pc_recurrspec, pc_alldayevent, pc_catid, pc_prefcatid " .
    "FROM openemr_postcalendar_events " .
-   "WHERE pc_aid = '$providerid' AND " .
+   "WHERE pc_aid = ? AND " .
    "pc_eid != '$eid' AND " .
    "((pc_endDate >= '$sdate' AND pc_eventDate < '$edate') OR " .
    "(pc_endDate = '0000-00-00' AND pc_eventDate >= '$sdate' AND pc_eventDate < '$edate'))";
   // phyaura whimmel facility filtering
   if ($_REQUEST['facility'] > 0 ) {
     $facility = $_REQUEST['facility'];
-    $query .= " AND pc_facility = $facility";
+    $query .= " AND pc_facility = ?";
+    array_push($sqlBindArray, $facility);
   }
   // end facility filtering whimmel 29apr08
-  $res = sqlStatement($query);
+  $res = sqlStatement($query, $sqlBindArray);
 
   while ($row = sqlFetchArray($res)) {
    $thistime = strtotime($row['pc_eventDate'] . " 00:00:00");
