@@ -78,15 +78,15 @@
  }
 
  // get problems
- $pres = sqlStatement("SELECT * FROM lists WHERE pid = $pid " .
-  "ORDER BY type, date");
+ $pres = sqlStatement("SELECT * FROM lists WHERE pid = ? " .
+  "ORDER BY type, date", array($pid));
 
  // get encounters
- $eres = sqlStatement("SELECT * FROM form_encounter WHERE pid = $pid " .
-  "ORDER BY date DESC");
+ $eres = sqlStatement("SELECT * FROM form_encounter WHERE pid = ? " .
+  "ORDER BY date DESC", array($pid));
 
  // get problem/encounter relations
- $peres = sqlStatement("SELECT * FROM issue_encounter WHERE pid = $pid");
+ $peres = sqlStatement("SELECT * FROM issue_encounter WHERE pid = ?", array($pid));
 ?>
 <html>
 <head>
