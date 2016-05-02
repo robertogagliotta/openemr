@@ -99,11 +99,11 @@ function decorateString($fmt, $str) {
 // This is special because it has to replace the inventory.
 //
 function delete_drug_sales($patient_id, $encounter_id=0) {
-  $where = $encounter_id ? "ds.encounter = '$encounter_id'" :
-    "ds.pid = '$patient_id' AND ds.encounter != 0";
+  $where = $encounter_id ? "ds.encounter = '" . add_escape_custom($encounter_id) . "'" :
+    "ds.pid = '" . add_escape_custom($patient_id) . "' AND ds.encounter != 0";
   sqlStatement("UPDATE drug_sales AS ds, drug_inventory AS di " .
     "SET di.on_hand = di.on_hand + ds.quantity " .
-    "WHERE ? AND di.inventory_id = ds.inventory_id", array($where));
+    "WHERE $where AND di.inventory_id = ds.inventory_id");
   if ($encounter_id) {
     row_delete("drug_sales", "encounter = '" . add_escape_custom($encounter_id) . "'");
   }
@@ -289,7 +289,7 @@ function popup_close() {
           }
         }
         if ($ref_id == -1) {
-          die(xlt('Unable to match this payment in ar_activity') . ": text($tpmt)");
+          die(xlt('Unable to match this payment in ar_activity') . ": " . text($tpmt));
         }
         // Delete the payment.
         row_delete("ar_activity",
