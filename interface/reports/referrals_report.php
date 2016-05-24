@@ -38,7 +38,7 @@
 <html>
 <head>
 <?php html_header_show();?>
-<title><?php xlt('Referrals'); ?></title>
+<title><?php echo xlt('Referrals'); ?></title>
 
 <style type="text/css">@import url(../../library/dynarch_calendar.css);</style>
 
@@ -122,7 +122,7 @@
 				<?php echo xlt('Facility'); ?>:
 			</td>
 			<td>
-			<?php echo text(dropdown_facility(strip_escape_custom($form_facility), 'form_facility', true)); ?>
+			<?php dropdown_facility(($form_facility), 'form_facility', true); ?>
 			</td>
 			<td class='label'>
 			   <?php echo xlt('From'); ?>:
