@@ -31,8 +31,8 @@
  require_once "$srcdir/options.inc.php";
  require_once "$srcdir/formdata.inc.php";
 
- $from_date = fixDate($_POST['form_from_date'], date('Y-m-d'));
- $to_date   = fixDate($_POST['form_to_date'], date('Y-m-d'));
+ $from_date = (isset($_POST['form_from_date']))  ? fixDate($_POST['form_from_date'], date('Y-m-d')) : '';
+ $to_date   = (isset($_POST['form_to_date']))    ? fixDate($_POST['form_to_date'], date('Y-m-d')) : '';;
  $form_facility = isset($_POST['form_facility']) ? $_POST['form_facility'] : '';
 ?>
 <html>
