@@ -1,8 +1,24 @@
 <?php
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+/**
+ * Installation script.
+ *
+ * Copyright (C) 2016 Roberto Vasquez <robertogagliotta@gmail.com>
+ *
+ * LICENSE: This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY of FITNESS FOR A PARTICULAR PURPOSE, See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the CNU General Public License
+ * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
+*
+* @package OpenEMR
+* @author Roberto Vasquez <robertogagliotta@gmail.com>
+*
+**/ 
 
 $COMMAND_LINE = php_sapi_name() == 'cli';
 require_once (dirname(__FILE__) . '/library/authentication/password_hashing.php');
@@ -307,7 +323,32 @@ else {
   case 3:
 
     // Form Validation
-    //   (applicable if not cloning from another database)
+    $server_host = 'localhost';
+    $server_port = '3306';
+    $data_base   = 'openemr';
+    $login       = 'openemr';
+    
+    if (!empty($_REQUEST['server'])) 
+      $server_host = trim($_REQUEST['server']);
+    if (preg_match('/[^A-Za-z0-9\\-.]/', $server_host))
+        die("ERROR. Server Host '".htmlspecialchars($server_host,ENT_NOQUOTES)."' contains invalid characters.");
+    if (!empty($_REQUEST['port'])) 
+      $server_port = trim($_REQUEST['port']);
+    if (preg_match('/[^A-Za-z0-9\\-.]/', $server_port))
+        die("ERROR. Server Port '".htmlspecialchars($server_port,ENT_NOQUOTES)."' contains invalid characters.");
+    if (!empty($_REQUEST['dbname'])) 
+      $data_base = trim($_REQUEST['dbname']);
+    if (preg_match('/[^A-Za-z0-9\\-.]/', $data_base))
+        die("ERROR. Server Host '".htmlspecialchars($data_base,ENT_NOQUOTES)."' contains invalid characters.");
+    if (!empty($_REQUEST['login'])) 
+      $login = trim($_REQUEST['login']);
+    if (preg_match('/[^A-Za-z0-9\\-.]/', $login))
+        die("ERROR. Login Name '".htmlspecialchars($login,ENT_NOQUOTES)."' contains invalid characters.");
+    if (!empty($_REQUEST['pass'])) 
+      $password = trim($_REQUEST['pass']);
+    if (preg_match('/[^A-Za-z0-9\\-.]/', $password))
+        die("ERROR. Password '".htmlspecialchars($password,ENT_NOQUOTES)."' contains invalid characters.");
+      // die("Server Host '".attr($server_host)."' contains invalid characters.");
     if (empty($installer->clone_database)) { 
       if ( ! $installer->login_is_valid() ) {
         echo "ERROR. Please pick a proper 'Login Name'.<br>\n";
