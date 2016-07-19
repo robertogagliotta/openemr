@@ -336,28 +336,29 @@ else {
 
     if (!empty($_REQUEST['server']))
        $server_host = trim($_REQUEST['server']);    
-    if (preg_match('@[\\\\;()<>/\'"]@', $server_host)) {
+    if ( ! $installer->char_is_valid($server_host)) {
        $pass_step2_validation = FALSE;
-       $error_step2_message = $error_step2_message . "Server Host, "; 
-     }
+       $error_step2_message = $error_step2_message . "SERVER Host, ";
+    }
+
     if (!empty($_REQUEST['port']))
        $server_port = trim($_REQUEST['port']);    
-    if (preg_match('@[\\\\;()<>/\'"]@', $server_port)) {
-       $pass_step2_validation = FALSE;
-       $error_step2_message = $error_step2_message . "Server Port, "; 
+    if ( ! $installer->char_is_valid($server_port))  {
+        $pass_step2_validation = FALSE;
+        $error_step2_message = $error_step2_message . "Server Port, ";
      }
     if (!empty($_REQUEST['dbname']))
        $data_base = trim($_REQUEST['dbname']);    
-    if (preg_match('@[\\\\;()<>/\'"]@', $data_base)) {
-       $pass_step2_validation = FALSE;
-       $error_step2_message = $error_step2_message . "Data Base Name, "; 
-     }
+    if ( ! $installer->char_is_valid($data_base))  {
+        $pass_step2_validation = FALSE;
+        $error_step2_message = $error_step2_message . "Data Base Name, ";
+    }  
     if (!empty($_REQUEST['login']))
        $login = trim($_REQUEST['login']);    
-    if (preg_match('@[\\\\;()<>/\'"]@', $login)) {
-       $pass_step2_validation = FALSE;
-       $error_step2_message = $error_step2_message . "Login Name, "; 
-     }
+    if ( ! $installer->char_is_valid($login))  {
+        $pass_step2_validation = FALSE;
+        $error_step2_message = $error_step2_message . "Login Name, ";
+    }
     if (!$pass_step2_validation) {
        die($error_step2_message);  
      }
