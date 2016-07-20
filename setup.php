@@ -1,8 +1,24 @@
 <?php
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+/**
+ * Installation script.
+ *
+ * Copyright (C) 2016 Roberto Vasquez <robertogagliotta@gmail.com>
+ *
+ * LICENSE: This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be usefull,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY OF FITNESS FOR A PARTICULAR PURPOSE, See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the CNU General Public License
+ * along with this program. If not, see <http://opensource.org/Licenses/gpl-license.php>;.
+ *
+ * @package OpenEMR
+ * @author Roberto Vasquez <robertogagliotta@gmail.com>
+ * 
+**/
 
 $COMMAND_LINE = php_sapi_name() == 'cli';
 require_once (dirname(__FILE__) . '/library/authentication/password_hashing.php');
@@ -55,6 +71,15 @@ if (!$COMMAND_LINE && !empty($_REQUEST['site'])) {
 // Die if site ID is empty or has invalid characters.
 if (empty($site_id) || preg_match('/[^A-Za-z0-9\\-.]/', $site_id))
   die("Site ID '".htmlspecialchars($site_id,ENT_NOQUOTES)."' contains invalid characters.");
+
+// step 3 variables
+
+    $server_host = 'localhost';
+    $server_port = '3306';
+    $data_base   = 'openemr';
+    $login       = 'openemr';
+    $pass_step2_validation = TRUE;
+    $error_step2_message = "ERROR AT ";
 
 //If having problems with file and directory permission
 // checking, then can be manually disabled here.
@@ -308,6 +333,37 @@ else {
 
     // Form Validation
     //   (applicable if not cloning from another database)
+
+    if (!empty($_REQUEST['server']))
+       $server_host = trim($_REQUEST['server']);    
+    if ( ! $installer->char_is_valid($server_host)) {
+       $pass_step2_validation = FALSE;
+       $error_step2_message = $error_step2_message . "SERVER Host, ";
+    }
+
+    if (!empty($_REQUEST['port']))
+       $server_port = trim($_REQUEST['port']);    
+    if ( ! $installer->char_is_valid($server_port))  {
+        $pass_step2_validation = FALSE;
+        $error_step2_message = $error_step2_message . "Server Port, ";
+     }
+    if (!empty($_REQUEST['dbname']))
+       $data_base = trim($_REQUEST['dbname']);    
+    if ( ! $installer->char_is_valid($data_base))  {
+        $pass_step2_validation = FALSE;
+        $error_step2_message = $error_step2_message . "Data Base Name, ";
+    }  
+    if (!empty($_REQUEST['login']))
+       $login = trim($_REQUEST['login']);    
+    if ( ! $installer->char_is_valid($login))  {
+        $pass_step2_validation = FALSE;
+        $error_step2_message = $error_step2_message . "Login Name, ";
+    }
+    if (!$pass_step2_validation) {
+       die($error_step2_message);  
+     }
+
+
     if (empty($installer->clone_database)) { 
       if ( ! $installer->login_is_valid() ) {
         echo "ERROR. Please pick a proper 'Login Name'.<br>\n";
