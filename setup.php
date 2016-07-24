@@ -72,15 +72,6 @@ if (!$COMMAND_LINE && !empty($_REQUEST['site'])) {
 if (empty($site_id) || preg_match('/[^A-Za-z0-9\\-.]/', $site_id))
   die("Site ID '".htmlspecialchars($site_id,ENT_NOQUOTES)."' contains invalid characters.");
 
-// step 3 variables
-
-    $server_host = 'localhost';
-    $server_port = '3306';
-    $data_base   = 'openemr';
-    $login       = 'openemr';
-    $pass_step2_validation = TRUE;
-    $error_step2_message = "ERROR AT ";
-
 //If having problems with file and directory permission
 // checking, then can be manually disabled here.
 $checkPermissions = True;
@@ -333,31 +324,26 @@ else {
 
     // Form Validation
     //   (applicable if not cloning from another database)
+    
+    $pass_step2_validation = TRUE;
+    $error_step2_message   = "ERROR AT ";
 
-    if (!empty($_REQUEST['server']))
-       $server_host = trim($_REQUEST['server']);    
-    if ( ! $installer->char_is_valid($server_host)) {
+    if ( ! $installer->char_is_valid(trim($_REQUEST['server']))) {
        $pass_step2_validation = FALSE;
-       $error_step2_message = $error_step2_message . "SERVER Host, ";
+       $error_step2_message .=  "SERVER Host, ";
     }
 
-    if (!empty($_REQUEST['port']))
-       $server_port = trim($_REQUEST['port']);    
-    if ( ! $installer->char_is_valid($server_port))  {
+    if ( ! $installer->char_is_valid(trim($_REQUEST['port'])))  {
         $pass_step2_validation = FALSE;
-        $error_step2_message = $error_step2_message . "Server Port, ";
+        $error_step2_message .=  "Server Port, ";
      }
-    if (!empty($_REQUEST['dbname']))
-       $data_base = trim($_REQUEST['dbname']);    
-    if ( ! $installer->char_is_valid($data_base))  {
+    if ( ! $installer->char_is_valid(trim($_REQUEST['dbname'])))  {
         $pass_step2_validation = FALSE;
-        $error_step2_message = $error_step2_message . "Data Base Name, ";
+        $error_step2_message .= "Data Base Name, ";
     }  
-    if (!empty($_REQUEST['login']))
-       $login = trim($_REQUEST['login']);    
-    if ( ! $installer->char_is_valid($login))  {
+    if ( ! $installer->char_is_valid(trim($_REQUEST['login'])))  {
         $pass_step2_validation = FALSE;
-        $error_step2_message = $error_step2_message . "Login Name, ";
+        $error_step2_message .= "Login Name, ";
     }
     if (!$pass_step2_validation) {
        die($error_step2_message);  

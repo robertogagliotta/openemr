@@ -73,6 +73,10 @@ class Installer
 
   public function char_is_valid($input_text)
   {
+    if ($input_text == '')
+       {
+         return FALSE;
+       }
     if (preg_match('@[\\\\;()<>/\'"]@', $input_text))
       {
         return FALSE;
