@@ -127,7 +127,7 @@ if (is_dir($mainPATH)) {
                 }
             }
             else if ($db == 'SNOMED') {
-                if (preg_match("/SnomedCT_INT_([0-9]{8}).zip/",$file,$matches)) {
+                if (preg_match("/SnomedCT_RF1Release_INT_([0-9]{8}).zip/",$file,$matches)) {
     
                     // Hard code the version SNOMED feed to be International:English
                     //  (if add different SNOMED types/versions/languages, then can use this)
