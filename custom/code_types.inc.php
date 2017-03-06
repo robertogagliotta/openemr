@@ -144,9 +144,11 @@ define_external_table($code_external_tables,5,'icd9_sg_code','formatted_sg_code'
 
 // For generic concepts, use the fully specified description (DescriptionType=3) so we can tell the difference between them.
 define_external_table($code_external_tables,7,'sct_descriptions','ConceptId','Term','Term',array("DescriptionStatus=0","DescriptionType=3"),"");
-define_external_table($code_external_tables,10,'sct2_description','id','term','term',array("active=1"),"");
-define_external_table($code_external_tables,11,'sct2_description','id','term','term',array("active=1"),"");
-define_external_table($code_external_tables,12,'sct2_description','id','term','term',array("active=1"),"");
+define_external_table($code_external_tables,10,'sct2_description','conceptId','term','term',array("active=1","term LIKE '%(disorder)'"),"");
+//define_external_table($code_external_tables,10,'sct2_description','conceptId','term','term',array("active=1"),"");
+define_external_table($code_external_tables,11,'sct2_description','conceptId','term','term',array("active=1"),"");
+//define_external_table($code_external_tables,12,'sct2_description','conceptId','term','term',array("active=1"),"");
+define_external_table($code_external_tables,12,'sct2_description','conceptId','term','term',array("active=1","term LIKE '%(procedure)'"),"");
 
 
 // To determine codes, we need to evaluate data in both the sct_descriptions table, and the sct_concepts table.

@@ -244,7 +244,36 @@ function snomed_import($us_extension=FALSE) {
     return true;
 }
 
-function snomedRF2_import($us_extension=FALSE) {
+function drop_old_sct() {
+    $array_to_truncate=array(
+        "sct_concepts_drop"=>"DROP TABLE IF EXISTS `sct_concepts`",
+        "sct_descriptions_drop"=>"DROP TABLE IF EXISTS `sct_descriptions`",
+        "sct_relationships_drop"=>"DROP TABLE IF EXISTS `sct_relationships`"
+);
+    foreach($array_to_truncate as $val){
+       if(trim($val)!=''){
+           sqlStatement($val);
+        }
+    }
+}
+
+function drop_old_sct2() {
+    $array_to_truncate=array(
+        "sct2_concept_drop"=>"DROP TABLE IF EXISTS `sct2_concept`",
+        "sct2_description_drop"=>"DROP TABLE IF EXISTS `sct2_description`",
+        "sct2_identifier_drop"=>"DROP TABLE IF EXISTS `sct2_identifier`",
+        "sct2_relationship_drop"=>"DROP TABLE IF EXISTS `sct2_relationship`",
+        "sct2_statedrelationship_drop"=>"DROP TABLE IF EXISTS `sct2_statedrelationship`",
+        "sct2_textdefinition_drop"=>"DROP TABLE IF EXISTS `sct2_textdefinition`"
+);
+    foreach($array_to_truncate as $val){
+       if(trim($val)!=''){
+           sqlStatement($val);
+        }
+    }
+}
+//function snomedRF2_import($us_extension=FALSE) {
+function snomedRF2_import() {
 
     // set up array
     $table_array_for_snomed=array(
@@ -328,14 +357,14 @@ function snomedRF2_import($us_extension=FALSE) {
 
     // executing the create statement for tables, these are defined in snomed_capture.inc file
     // this is skipped if the US extension is being added
-    if (!$us_extension) {
+    //if (!$us_extension) {
         //var_dump($us_extension);
         foreach($table_array_for_snomed as $val){
             if(trim($val)!=''){
                 sqlStatement($val);
             }
         }
-    }
+    //}
 
     // reading the SNOMED directory and identifying the files to import and replacing the variables by originals values.
     if( is_dir($dir) && $handle = opendir($dir)) {
