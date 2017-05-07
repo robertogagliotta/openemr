@@ -24,7 +24,7 @@
  * @link    http://www.open-emr.org
  */
 
-
+require_once("../../interface/super/edit_list.php");
 // Function to copy a package to temp
 // $type (RXNORM, SNOMED etc.)
 function temp_copy($filename,$type) {
@@ -272,7 +272,65 @@ function drop_old_sct2() {
         }
     }
 }
-//function snomedRF2_import($us_extension=FALSE) {
+
+
+function chg_ct_external_torf1()  {
+$SNOMED = 103;
+$SNOMED_CT = 107;
+$SNOMED_PR = 108;
+$SNOMED_key = 'SNOMED';
+$SNOMED_CT_key = 'SNOMED-CT';
+$SNOMED_PR_key = 'SNOMED-PR';
+$def_diagnosis = 2;
+$def_clinical = 7;
+$def_procedure = 9;
+sqlQuery("UPDATE code_types SET ct_external = '$def_diagnosis' " .
+   "WHERE ((ct_id = '$SNOMED') AND (ct_key = '$SNOMED_key'))");
+
+sqlQuery("UPDATE code_types SET ct_external = '$def_clinical' " .
+   "WHERE ((ct_id = '$SNOMED_CT') AND (ct_key = '$SNOMED_CT_key'))");
+
+sqlQuery("UPDATE code_types SET ct_external = '$def_procedure' " .
+   "WHERE ((ct_id = '$SNOMED_PR') AND (ct_key = '$SNOMED_PR_key'))");
+
+$res = sqlStatement("SELECT * FROM code_types " .
+  "ORDER BY ct_seq, ct_key");
+while ($row = sqlFetchArray($res)) {
+    writeCTLine($row);
+  }
+for ($i = 0; $i < 3; ++$i) {
+    writeCTLine(array());
+  }
+}
+function chg_ct_external_torf2()  {
+$SNOMED = 103;
+$SNOMED_CT = 107;
+$SNOMED_PR = 108;
+$SNOMED_key = 'SNOMED';
+$SNOMED_CT_key = 'SNOMED-CT';
+$SNOMED_PR_key = 'SNOMED-PR';
+$def_diagnosis = 10;
+$def_clinical = 11;
+$def_procedure = 12;
+sqlQuery("UPDATE code_types SET ct_external = '$def_diagnosis' " .
+   "WHERE ((ct_id = '$SNOMED') AND (ct_key = '$SNOMED_key'))");
+
+sqlQuery("UPDATE code_types SET ct_external = '$def_clinical' " .
+   "WHERE ((ct_id = '$SNOMED_CT') AND (ct_key = '$SNOMED_CT_key'))");
+
+sqlQuery("UPDATE code_types SET ct_external = '$def_procedure' " .
+   "WHERE ((ct_id = '$SNOMED_PR') AND (ct_key = '$SNOMED_PR_key'))");
+
+$res = sqlStatement("SELECT * FROM code_types " .
+  "ORDER BY ct_seq, ct_key");
+while ($row = sqlFetchArray($res)) {
+    writeCTLine($row);
+  }
+for ($i = 0; $i < 3; ++$i) {
+    writeCTLine(array());
+  }
+}
+
 function snomedRF2_import() {
 
     // set up array
@@ -297,7 +355,7 @@ function snomedRF2_import() {
             `typeId` bigint(25) NOT NULL,
             `term` varchar(255) NOT NULL,
             `caseSignificanceId` bigint(25) NOT NULL,
-             PRIMARY KEY (`id`)
+             PRIMARY KEY (`id`, `active`, `conceptId`)
             ) ENGINE=InnoDB",
         "sct2_identifier_drop"=>"DROP TABLE IF EXISTS `sct2_identifier`",
         "sct2_identifier_structure"=>"CREATE TABLE IF NOT EXISTS `sct2_identifier` (

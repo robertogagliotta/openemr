@@ -78,24 +78,24 @@ if ($db == 'RXNORM') {
     }
 } else if ( $db == 'SNOMED') {
     if ($version == "US Extension") {
-        //if (!snomed_import(TRUE)) {
-        if (!snomed_import()) {
+        if (!snomed_import(TRUE)) {
             echo htmlspecialchars( xl('ERROR: Unable to load the file into the database.'), ENT_NOQUOTES)."<br>";
             temp_dir_cleanup($db);
             exit;
          } else {
              drop_old_sct2();
+             chg_ct_external_torf1;
          }
     }
     if (strncmp($version, "RF2", 3) == 0 ) {
         $version = ltrim($version, "RF2");  
-        //if (!snomedRF2_import(FALSE)) {
         if (!snomedRF2_import()) {
             echo htmlspecialchars( xl('ERROR: Unable to load the file into the database.'), ENT_NOQUOTES)."<br>";
             temp_dir_cleanup($db);
             exit;
         } else {
             drop_old_sct();
+            chg_ct_external_torf2();
         }
     }
     else { //$version is not "US Extension"
@@ -105,6 +105,7 @@ if ($db == 'RXNORM') {
             exit;
          } else {
              drop_old_sct2();
+             chg_ct_external_torf1();
          }
     }
 }
