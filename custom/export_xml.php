@@ -252,24 +252,40 @@
 ?>
 <html>
 <head>
-<?php html_header_show();?>
-<link rel=stylesheet href="<?php echo $css_header;?>" type="text/css">
+<?php html_header_show();
+require "{$GLOBALS['srcdir']}/templates/standard_header_template.php"; ?>
 <title><?php xl('Export Patient Demographics','e'); ?></title>
 </head>
-<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="page-header">  
+                    <h4><?php echo xlt('The exported data appears in the text area below. You can copy and
+                        paste this into an email or to any other desired destination.'); ?></h4>
+                </div>
+            </div>
+         </div>
+         <div class="row">
+             <div class="col-xs-12">
+                 <div class="form-group">
+                         <label class="control-label col-sm-2">{xl t='EXPORT SCRIPT'|escape:'html'}</label>
+                     <div class="col-sm-10">
+	                 <textarea name="export_data" class=form-control" cols="50" rows="18"><?php echo $out ?></textarea>
+                     </div>
+                 </div>
+                 <div class="form-group">
+                     <div class="col-sm-offset-2 col-sm-10">
+                         <div class="btn-group" role="group">
+                             <button type="button" class="btn btn-default btn-save" name="OK"></button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
 
-<p><?php xl('The exported data appears in the text area below.  You can copy and
-paste this into an email or to any other desired destination.','e'); ?></p>
 
-<center>
-<form>
-
-<textarea rows='10' cols='50' style='width:95%' readonly>
-<?php echo $out ?>
-</textarea>
-
-<p><input type='button' value=<?php xl('OK','e','\'','\''); ?> onclick='window.close()' /></p>
-</form>
+</body>
 </center>
 
 </body>
